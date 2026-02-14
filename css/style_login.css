@@ -1,0 +1,124 @@
+/* Reset */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+/* Fondo general */
+body{
+    background:#d9d2c0; /* beige claro */
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* Contenedor principal */
+.contenedor{
+    width:420px;
+    text-align:center;
+}
+
+/* Logo */
+#logo{
+    width:150px;        /* tamaño más pequeño */
+    height:150px;
+    margin:0 auto 40px auto;
+    background-image:url("../img/logo.png");
+    background-size: contain;  /* que no se deforme */
+    background-repeat:no-repeat;
+    background-position:center;
+}
+
+
+/* Título opcional si lo agregas después */
+.contenedor h1{
+    color:#3d5f0d;
+    font-weight:500;
+    font-size:42px;
+    margin-bottom:40px;
+}
+
+/* Grupo input */
+.datos{
+    display:flex;
+    width:100%;
+    height:55px;              /* altura fija */
+    margin-bottom:20px;
+}
+
+.datos input:focus{
+    background:#E0E0E0;
+}
+
+/* Icono */
+.icon{
+    width:55px;
+    height:100%;
+    background:#e0e0e0;
+    border:1px solid #333;
+    border-right:none;        /* elimina línea del centro */
+    border-radius:20px 0 0 20px; /* redondea solo lado izquierdo */
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.icon img{
+    width:26px;
+    opacity:0.6;
+}
+
+/* Input */
+.datos input{
+    flex:1;
+    height:100%;
+    border:1px solid #333;
+    border-left:none;         /* elimina línea del centro */
+    border-radius:0 20px 20px 0; /* redondea lado derecho */
+    background:#e0e0e0;
+    padding-left:0px;
+    font-size:16px;
+    outline:none;
+}
+
+/* Botón */
+button{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:20px;
+    background:#d6b632;
+    color:white;
+    font-size:22px;
+    cursor:pointer;
+    margin-top:10px;
+    transition:0.3s;
+    box-shadow: 0 3px 0 #8f7a1e;
+}
+
+button:hover{
+    background:#c7a82c;
+}
+
+/* Links */
+.link{
+    margin-top:18px;
+    font-size:16px;
+    color:#2c4e8a;
+}
+
+/* Crear cuenta */
+.registro{
+    color:#e67e22;
+    cursor:pointer;
+}
+
+/* Pie de página */
+.pieP{
+    margin-top:60px;
+    color:#888;
+    font-size:14px;
+}
