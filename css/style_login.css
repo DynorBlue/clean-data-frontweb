@@ -113,7 +113,12 @@ button:hover{
 /* Crear cuenta */
 .registro{
     color:#e67e22;
+    text-decoration: none;
     cursor:pointer;
+}
+
+.registro:hover{
+    text-decoration: underline;
 }
 
 /* Pie de página */
