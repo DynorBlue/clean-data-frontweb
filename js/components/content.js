@@ -21,6 +21,30 @@ const modules = {
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Camiones</h5>
+                                <p class="card-text">Gestiona los camiones del sistema</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Conductores</h5>
+                                <p class="card-text">Gestiona los conductores del sistema</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Recolecciones</h5>
+                                <p class="card-text">Gestiona las recolecciones del sistema</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         `
@@ -57,6 +81,57 @@ const modules = {
         init: async () => {
             const { loadUsuarios } = await import('../api/usuarios.js');
             document.getElementById('loadUsuariosBtn')?.addEventListener('click', loadUsuarios);
+        }
+    },
+    camiones: {
+        title: 'Camiones',
+        render: async () => {
+            const { loadCamiones } = await import('../api/camiones.js');
+            return `
+            <div class="container-fluid">
+                <h1>Gestión de Camiones</h1>
+                <button class="btn btn-primary mb-3" id="loadCamionesBtn">Cargar Camiones</button>
+                <div id="camionesContent"></div>
+            </div>
+            `;
+        },
+        init: async () => {
+            const { loadCamiones } = await import('../api/camiones.js');
+            document.getElementById('loadCamionesBtn')?.addEventListener('click', loadCamiones);
+        }
+    },
+    conductores: {
+        title: 'Conductores',
+        render: async () => {
+            const { loadConductores } = await import('../api/conductores.js');
+            return `
+            <div class="container-fluid">
+                <h1>Gestión de Conductores</h1>
+                <button class="btn btn-primary mb-3" id="loadConductoresBtn">Cargar Conductores</button>
+                <div id="conductoresContent"></div>
+            </div>
+            `;
+        },
+        init: async () => {
+            const { loadConductores } = await import('../api/conductores.js');
+            document.getElementById('loadConductoresBtn')?.addEventListener('click', loadConductores);
+        }
+    },
+    recolecciones: {
+        title: 'Recolecciones',
+        render: async () => {
+            const { loadRecolecciones } = await import('../api/recoleccion.js');
+            return `
+            <div class="container-fluid">
+                <h1>Gestión de Recolección</h1>
+                <button class="btn btn-primary mb-3" id="loadRecoleccionesBtn">Cargar Recolecciones</button>
+                <div id="recoleccionesContent"></div>
+            </div>
+            `;
+        },
+        init: async () => {
+            const { loadRecolecciones } = await import('../api/recoleccion.js');
+            document.getElementById('loadRecoleccionesBtn')?.addEventListener('click', loadRecolecciones);
         }
     }
 };

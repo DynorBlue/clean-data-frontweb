@@ -2,13 +2,16 @@ import { isAdmin, getUser } from '../auth/auth.js';
 
 const getMenuItems = () => {
     const items = [
-        { id: 'dashboard', label: 'Dashboard', icon: 'bi-house', href: 'index.html' }
+        { id: 'dashboard', label: 'Dashboard', icon: 'bi-house', href: '/index.html' }
     ];
 
     if (isAdmin()) {
         items.push(
-            { id: 'colonias', label: 'Colonias', icon: 'bi-building', href: 'html/colonias.html' },
-            { id: 'usuarios', label: 'Usuarios', icon: 'bi-people', href: 'html/usuarios.html' }
+            { id: 'colonias', label: 'Colonias', icon: 'bi-building', href: '/html/colonias.html' },
+            { id: 'usuarios', label: 'Usuarios', icon: 'bi-people', href: '/html/usuarios.html' },
+            { id: 'camiones', label: 'Camiones', icon: 'bi-truck', href: '/html/camiones.html' },
+            { id: 'conductores', label: 'Conductores', icon: 'bi-person-badge', href: '/html/conductores.html'},
+            { id: 'recolecciones', label: 'Recolecciones', icon: 'bi-trash', href: '/html/recoleccion.html'}
         );
     }
 
