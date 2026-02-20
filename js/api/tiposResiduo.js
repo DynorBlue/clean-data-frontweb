@@ -1,0 +1,192 @@
+import api, { showToast } from './api.js';
+
+export const getTiposResiduo = () => api.get('/tipos-residuo');
+export const getTipoResiduo = (id) => api.get(`/tipos-residuo/${id}`);
+export const createTipoResiduo = (data) => api.post('/tipos-residuo', data);
+export const updateTipoResiduo = (id, data) => api.put(`/tipos-residuo/${id}`, data);
+export const deleteTipoResiduo = (id) => api.delete(`/tipos-residuo/${id}`);
+export const buscarTiposResiduo = (query) => api.get(`/tipos-residuo/buscar?q=${encodeURIComponent(query)}`);
+
+let tiposResiduoData = [];
+
+export const loadTiposResiduo = async () => {
+    try {
+        const content = document.getElementById('tiposResiduoContent');
+        if (!content) return;
+
+        content.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
+
+        const tipos = await getTiposResiduo();
+        tiposResiduoData = tipos;
+
+        content.innerHTML = `
+            <div class="mb-3 d-flex gap-2 flex-wrap align-items-center">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tipoResiduoModal" onclick="window.tipoResiduoModalMode='create'; window.resetTipoResiduoModal();">
+                    <i class="bi bi-plus-circle"></i> Nuevo Tipo
+                </button>
+                <button class="btn btn-secondary" onclick="window.loadTiposResiduo()">
+                    <i class="bi bi-arrow-clockwise"></i> Actualizar
+                </button>
+                <div class="input-group" style="max-width:300px;">
+                    <input type="text" class="form-control" id="buscarTipoInput" placeholder="Buscar tipo...">
+                    <button class="btn btn-outline-secondary" onclick="window.buscarTipoResiduo()">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tipos.map(t => `
+                            <tr>
+                                <td>${t.idTipo}</td>
+                                <td>${t.nombre}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning" onclick="window.editarTipoResiduo(${t.idTipo})">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="window.eliminarTipoResiduo(${t.idTipo})">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+            ${renderTipoResiduoModal()}
+        `;
+    } catch (error) {
+        console.error('Error cargando tipos de residuo:', error);
+        showToast(error.message || 'Error al cargar tipos de residuo', 'danger');
+    }
+};
+
+const renderTipoResiduoModal = () => `
+    <div class="modal fade" id="tipoResiduoModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tipoResiduoModalTitle">Nuevo Tipo de Residuo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="tipoResiduoForm">
+                        <input type="hidden" id="tipoResiduoId">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="tipoResiduoNombre" required maxlength="50">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="window.guardarTipoResiduo()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+`;
+
+window.resetTipoResiduoModal = () => {
+    document.getElementById('tipoResiduoModalTitle').textContent = 'Nuevo Tipo de Residuo';
+    document.getElementById('tipoResiduoId').value = '';
+    document.getElementById('tipoResiduoNombre').value = '';
+};
+
+window.editarTipoResiduo = async (id) => {
+    try {
+        const tipo = await getTipoResiduo(id);
+
+        document.getElementById('tipoResiduoModalTitle').textContent = 'Editar Tipo de Residuo';
+        document.getElementById('tipoResiduoId').value = tipo.idTipo;
+        document.getElementById('tipoResiduoNombre').value = tipo.nombre || '';
+
+        window.tipoResiduoModalMode = 'edit';
+
+        const modal = new bootstrap.Modal(document.getElementById('tipoResiduoModal'));
+        modal.show();
+    } catch (error) {
+        showToast('Error al cargar tipo de residuo: ' + error.message, 'danger');
+    }
+};
+
+window.guardarTipoResiduo = async () => {
+    try {
+        const id = document.getElementById('tipoResiduoId').value;
+        const nombre = document.getElementById('tipoResiduoNombre').value.trim();
+
+        if (!nombre) {
+            showToast('El nombre es requerido', 'warning');
+            return;
+        }
+
+        const data = { nombre };
+
+        if (id && window.tipoResiduoModalMode === 'edit') {
+            await updateTipoResiduo(id, data);
+            showToast('Tipo de residuo actualizado correctamente', 'success');
+        } else {
+            await createTipoResiduo(data);
+            showToast('Tipo de residuo creado correctamente', 'success');
+        }
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById('tipoResiduoModal'));
+        modal.hide();
+
+        loadTiposResiduo();
+    } catch (error) {
+        showToast(error.message || 'Error al guardar tipo de residuo', 'danger');
+    }
+};
+
+window.eliminarTipoResiduo = async (id) => {
+    if (!confirm('¿Está seguro de eliminar este tipo de residuo?')) return;
+
+    try {
+        await deleteTipoResiduo(id);
+        showToast('Tipo de residuo eliminado correctamente', 'success');
+        loadTiposResiduo();
+    } catch (error) {
+        showToast(error.message || 'Error al eliminar tipo de residuo', 'danger');
+    }
+};
+
+window.buscarTipoResiduo = async () => {
+    const query = document.getElementById('buscarTipoInput')?.value.trim();
+    if (!query) {
+        loadTiposResiduo();
+        return;
+    }
+    try {
+        const tipos = await buscarTiposResiduo(query);
+        const tbody = document.querySelector('#tiposResiduoContent table tbody');
+        if (tbody) {
+            tbody.innerHTML = tipos.map(t => `
+                <tr>
+                    <td>${t.idTipo}</td>
+                    <td>${t.nombre}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" onclick="window.editarTipoResiduo(${t.idTipo})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="window.eliminarTipoResiduo(${t.idTipo})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+    } catch (error) {
+        showToast(error.message || 'Error en la búsqueda', 'danger');
+    }
+};
+
+window.loadTiposResiduo = loadTiposResiduo;

@@ -2,16 +2,21 @@ import { isAdmin, getUser } from '../auth/auth.js';
 
 const getMenuItems = () => {
     const items = [
-        { id: 'dashboard', label: 'Dashboard', icon: 'bi-house', href: '/index.html' }
+        { id: 'dashboard', label: 'Dashboard', icon: 'bi-house' }
     ];
 
     if (isAdmin()) {
         items.push(
-            { id: 'colonias', label: 'Colonias', icon: 'bi-building', href: '/html/colonias.html' },
-            { id: 'usuarios', label: 'Usuarios', icon: 'bi-people', href: '/html/usuarios.html' },
-            { id: 'camiones', label: 'Camiones', icon: 'bi-truck', href: '/html/camiones.html' },
-            { id: 'conductores', label: 'Conductores', icon: 'bi-person-badge', href: '/html/conductores.html'},
-            { id: 'recolecciones', label: 'Recolecciones', icon: 'bi-trash', href: '/html/recoleccion.html'}
+            { id: 'colonias', label: 'Colonias', icon: 'bi-building' },
+            { id: 'ciudadanos', label: 'Ciudadanos', icon: 'bi-people' },
+            { id: 'conductores', label: 'Conductores', icon: 'bi-person-badge' },
+            { id: 'camiones', label: 'Camiones', icon: 'bi-truck' },
+            { id: 'rutas', label: 'Rutas', icon: 'bi-signpost-2' },
+            { id: 'viajes', label: 'Viajes', icon: 'bi-map' },
+            { id: 'recolecciones', label: 'Recolecciones', icon: 'bi-trash' },
+            { id: 'reportes', label: 'Reportes', icon: 'bi-exclamation-triangle' },
+            { id: 'tiposResiduo', label: 'Tipos de Residuo', icon: 'bi-recycle' },
+            { id: 'camionesGps', label: 'GPS Camiones', icon: 'bi-geo-alt' }
         );
     }
 
@@ -35,7 +40,7 @@ const renderSidebar = () => {
     menuItems.forEach(item => {
         html += `
             <li class="nav-item">
-                <a class="nav-link" href="${item.href}" data-module="${item.id}">
+                <a class="nav-link" href="?module=${item.id}" data-module="${item.id}">
                     <i class="bi ${item.icon}"></i> ${item.label}
                 </a>
             </li>
