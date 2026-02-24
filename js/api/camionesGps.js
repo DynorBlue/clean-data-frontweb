@@ -9,7 +9,6 @@ export const deleteCamionGps = (id) => api.delete(`/camiones-gps/${id}`);
 export const getGpsByCamion = (idCamion) => api.get(`/camiones-gps/camion/${idCamion}`);
 
 let gpsData = [];
-let camionesList = [];
 
 export const loadCamionesGps = async () => {
     try {
@@ -24,7 +23,7 @@ export const loadCamionesGps = async () => {
         ]);
 
         gpsData = gpsList;
-        camionesList = camiones;
+        window.gpsCamionesList = camiones;
 
         content.innerHTML = `
             <div class="mb-3 d-flex gap-2 flex-wrap align-items-center">
@@ -97,7 +96,7 @@ const renderGpsModal = () => `
                             <label class="form-label">Camión</label>
                             <select class="form-select" id="gpsCamion" required>
                                 <option value="">Seleccionar camión</option>
-                                ${camionesList.map(c => `<option value="${c.idCamion}">${c.placas} - ${c.modelo}</option>`).join('')}
+                                ${(window.gpsCamionesList || []).map(c => `<option value="${c.idCamion}">${c.placas} - ${c.modelo}</option>`).join('')}
                             </select>
                         </div>
                         <div class="row">
@@ -138,6 +137,7 @@ window.resetGpsModal = async () => {
     document.getElementById('gpsFecha').value = '';
     
     const camiones = await getCamiones();
+    window.gpsCamionesList = camiones;
     document.getElementById('gpsCamion').innerHTML = '<option value="">Seleccionar camión</option>' + 
         camiones.map(c => `<option value="${c.idCamion}">${c.placas} - ${c.modelo}</option>`).join('');
 };
@@ -177,7 +177,7 @@ window.guardarGps = async () => {
         }
 
         const data = {
-            idCamion: parseInt(idCamion),
+            camion: { idCamion: parseInt(idCamion) },
             latitud: latitud ? parseFloat(latitud) : null,
             longitud: longitud ? parseFloat(longitud) : null,
             velocidad: velocidad ? parseFloat(velocidad) : null,

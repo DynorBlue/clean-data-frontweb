@@ -179,14 +179,19 @@ window.guardarColonia = async () => {
 };
 
 window.eliminarColonia = async (id) => {
-    if (!confirm('¿Está seguro de eliminar esta colonia?')) return;
+    if (!confirm('¿Está seguro de eliminar esta colonia?\n\nNota: Si hay ciudadanos, reportes o rutas asociadas, no se podrá eliminar.')) return;
     
     try {
         await deleteColonia(id);
         showToast('Colonia eliminada correctamente', 'success');
         loadColonias();
     } catch (error) {
-        showToast(error.message || 'Error al eliminar colonia', 'danger');
+        console.error('Error al eliminar colonia:', error);
+        if (error.message && error.message.includes('foreign key constraint')) {
+            showToast('No se puede eliminar: hay ciudadanos, reportes o rutas asociados a esta colonia', 'warning');
+        } else {
+            showToast(error.message || 'Error al eliminar colonia. Verifique que no tenga registros asociados.', 'danger');
+        }
     }
 };
 

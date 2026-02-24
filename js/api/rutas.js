@@ -13,8 +13,8 @@ export const getResiduoHoy = () => api.get('/rutas/residuo-hoy');
 
 export const addColoniaToRuta = (idRuta, idColonia, idTipoResiduo, fechaRecoleccion) => 
     api.post(`/rutas/${idRuta}/colonias`, { 
-        idColonia, 
-        idTipoResiduo: idTipoResiduo || null,
+        colonia: { idColonia: parseInt(idColonia) },
+        tipoResiduo: idTipoResiduo ? { idTipo: parseInt(idTipoResiduo) } : null,
         fechaRecoleccion: fechaRecoleccion || null
     });
 

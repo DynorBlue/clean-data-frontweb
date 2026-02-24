@@ -14,8 +14,6 @@ export const getReportesByColonia = (idColonia) => api.get(`/reportes/colonia/${
 export const cambiarEstadoReporte = (id, estado) => api.patch(`/reportes/${id}/estado/${estado}`, {});
 
 let reportesData = [];
-let coloniasList = [];
-let tiposList = [];
 let currentFilter = 'todos';
 
 const getEstadoColor = (estado) => {
@@ -41,8 +39,8 @@ export const loadReportes = async () => {
         ]);
 
         reportesData = reportes;
-        coloniasList = colonias;
-        tiposList = tipos;
+        window.reportesColoniasList = colonias;
+        window.reportesTiposList = tipos;
 
         const user = getUser();
         const esAdmin = isAdmin();
@@ -140,14 +138,14 @@ const renderReporteModal = () => `
                             <label class="form-label">Colonia</label>
                             <select class="form-select" id="reporteColonia" required>
                                 <option value="">Seleccionar colonia</option>
-                                ${coloniasList.map(c => `<option value="${c.idColonia}">${c.nombre}</option>`).join('')}
+                                ${(window.reportesColoniasList || []).map(c => `<option value="${c.idColonia}">${c.nombre}</option>`).join('')}
                             </select>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Tipo de Residuo</label>
                             <select class="form-select" id="reporteTipoResiduo">
                                 <option value="">Seleccionar tipo (opcional)</option>
-                                ${tiposList.map(t => `<option value="${t.idTipo}">${t.nombre}</option>`).join('')}
+                                ${(window.reportesTiposList || []).map(t => `<option value="${t.idTipo}">${t.nombre}</option>`).join('')}
                             </select>
                         </div>
                         <div class="mb-3">
@@ -175,6 +173,9 @@ window.resetReporteModal = async () => {
         getTiposResiduo()
     ]);
     
+    window.reportesColoniasList = colonias;
+    window.reportesTiposList = tipos;
+    
     document.getElementById('reporteColonia').innerHTML = '<option value="">Seleccionar colonia</option>' + 
         colonias.map(c => `<option value="${c.idColonia}">${c.nombre}</option>`).join('');
     document.getElementById('reporteTipoResiduo').innerHTML = '<option value="">Seleccionar tipo (opcional)</option>' + 
@@ -193,8 +194,8 @@ window.guardarReporte = async () => {
         }
 
         const data = {
-            idColonia: parseInt(idColonia),
-            idTipoResiduo: idTipoResiduo ? parseInt(idTipoResiduo) : null,
+            colonia: { idColonia: parseInt(idColonia) },
+            tipoResiduo: idTipoResiduo ? { idTipo: parseInt(idTipoResiduo) } : null,
             descripcion: descripcion || null
         };
 

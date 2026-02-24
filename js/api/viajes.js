@@ -47,10 +47,10 @@ export const loadViajes = async () => {
         ]);
 
         viajesData = viajes;
-        camionesList = camiones;
-        operadoresList = conductores;
-        rutasList = rutas;
-        tiposList = tipos;
+        window.viajesCamionesList = camiones;
+        window.viajesConductoresList = conductores;
+        window.viajesRutasList = rutas;
+        window.viajesTiposList = tipos;
 
         content.innerHTML = `
             <div class="mb-3 d-flex gap-2 flex-wrap align-items-center">
@@ -141,14 +141,14 @@ const renderViajeModal = () => `
                                 <label class="form-label">Camión</label>
                                 <select class="form-select" id="viajeCamion" required>
                                     <option value="">Seleccionar camión</option>
-                                    ${camionesList.map(c => `<option value="${c.idCamion}">${c.placas} - ${c.modelo}</option>`).join('')}
+                                    ${(window.viajesCamionesList || []).map(c => `<option value="${c.idCamion}">${c.placas} - ${c.modelo}</option>`).join('')}
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Conductor</label>
                                 <select class="form-select" id="viajeConductor" required>
                                     <option value="">Seleccionar conductor</option>
-                                    ${conductoresList.map(co => `<option value="${co.idPersona}">${co.persona?.nombre || co.nombre}</option>`).join('')}
+                                    ${(window.viajesConductoresList || []).map(co => `<option value="${co.idPersona}">${co.persona?.nombre || co.nombre}</option>`).join('')}
                                 </select>
                             </div>
                         </div>
@@ -157,14 +157,14 @@ const renderViajeModal = () => `
                                 <label class="form-label">Ruta</label>
                                 <select class="form-select" id="viajeRuta" required>
                                     <option value="">Seleccionar ruta</option>
-                                    ${rutasList.map(r => `<option value="${r.idRuta}">${r.nombre}</option>`).join('')}
+                                    ${(window.viajesRutasList || []).map(r => `<option value="${r.idRuta}">${r.nombre}</option>`).join('')}
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Tipo de Residuo</label>
                                 <select class="form-select" id="viajeTipoResiduo" required>
                                     <option value="">Seleccionar tipo</option>
-                                    ${tiposList.map(t => `<option value="${t.idTipo}">${t.nombre}</option>`).join('')}
+                                    ${(window.viajesTiposList || []).map(t => `<option value="${t.idTipo}">${t.nombre}</option>`).join('')}
                                 </select>
                             </div>
                         </div>
@@ -210,6 +210,11 @@ window.resetViajeModal = async () => {
         getRutas(),
         getTiposResiduo()
     ]);
+    
+    window.viajesCamionesList = camiones;
+    window.viajesConductoresList = conductores;
+    window.viajesRutasList = rutas;
+    window.viajesTiposList = tipos;
     
     document.getElementById('viajeCamion').innerHTML = '<option value="">Seleccionar camión</option>' + 
         camiones.map(c => `<option value="${c.idCamion}">${c.placas} - ${c.modelo}</option>`).join('');
@@ -261,10 +266,10 @@ window.guardarViaje = async () => {
         }
 
         const data = {
-            idCamion: parseInt(idCamion),
-            idConductor: parseInt(idConductor),
-            idRuta: parseInt(idRuta),
-            idTipoResiduo: parseInt(idTipoResiduo),
+            camion: { idCamion: parseInt(idCamion) },
+            conductor: { idPersona: parseInt(idConductor) },
+            ruta: { idRuta: parseInt(idRuta) },
+            tipoResiduo: { idTipo: parseInt(idTipoResiduo) },
             fechaInicio: fechaInicio || null,
             fechaFin: fechaFin || null,
             estado

@@ -36,6 +36,7 @@ export const loadConductores = async () => {
                             <th>ID</th>
                             <th>Nombre</th>
                             <th>Teléfono</th>
+                            <th>Email</th>
                             <th>Licencia</th>
                             <th>Fecha Alta</th>
                             <th>Estado</th>
@@ -48,6 +49,7 @@ export const loadConductores = async () => {
                                 <td>${c.idPersona}</td>
                                 <td>${c.persona?.nombre || '-'}</td>
                                 <td>${c.persona?.telefono || '-'}</td>
+                                <td>${c.persona?.usuario?.email || '-'}</td>
                                 <td>${c.licencia || '-'}</td>
                                 <td>${c.fechaAlta || '-'}</td>
                                 <td><span class="badge bg-${getEstadoConductorColor(c.estadoOperativo)}">${c.estadoOperativo || '-'}</span></td>
@@ -109,8 +111,8 @@ const renderConductorModal = () => `
                             <label class="form-label">Email</label>
                             <input type="email" class="form-control" id="conductorEmail" required>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Contraseña</label>
+                        <div class="mb-3" id="conductorPasswordGroup">
+                            <label class="form-label">Contraseña <small class="text-muted">(solo para nuevo)</small></label>
                             <input type="password" class="form-control" id="conductorPassword">
                         </div>
                         <div class="mb-3">
@@ -144,7 +146,9 @@ window.resetConductorModal = () => {
     document.getElementById('conductorTelefono').value = '';
     document.getElementById('conductorLicencia').value = '';
     document.getElementById('conductorEmail').value = '';
+    document.getElementById('conductorEmail').removeAttribute('readonly');
     document.getElementById('conductorPassword').value = '';
+    document.getElementById('conductorPasswordGroup').style.display = 'block';
     document.getElementById('conductorFechaAlta').value = '';
     document.getElementById('conductorEstado').value = 'ACTIVO';
 };
@@ -158,8 +162,10 @@ window.editarConductor = async (id) => {
         document.getElementById('conductorNombre').value = conductor.persona?.nombre || '';
         document.getElementById('conductorTelefono').value = conductor.persona?.telefono || '';
         document.getElementById('conductorLicencia').value = conductor.licencia || '';
-        document.getElementById('conductorEmail').value = '';
+        document.getElementById('conductorEmail').value = conductor.usuario?.email || '';
+        document.getElementById('conductorEmail').setAttribute('readonly', 'true');
         document.getElementById('conductorPassword').value = '';
+        document.getElementById('conductorPasswordGroup').style.display = 'none';
         document.getElementById('conductorFechaAlta').value = conductor.fechaAlta || '';
         document.getElementById('conductorEstado').value = conductor.estadoOperativo || 'ACTIVO';
         
