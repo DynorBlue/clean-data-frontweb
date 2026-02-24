@@ -169,7 +169,7 @@ window.editarCiudadano = async (id) => {
     document.getElementById("ciudadanoTelefono").value =
       ciudadano.persona?.telefono || "";
     document.getElementById("ciudadanoEmail").value =
-      ciudadano.usuario?.email || "";
+      ciudadano.persona?.email || "";
     document.getElementById("ciudadanoEmail").setAttribute("readonly", "true");
     document.getElementById("ciudadanoPassword").value = "";
     document.getElementById("ciudadanoPasswordGroup").style.display = "none";
