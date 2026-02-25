@@ -1,4 +1,5 @@
-import api, { showToast } from './api.js';
+import api from './api.js';
+import { SwalAlert } from '../components/utils.js';
 
 export const getTiposResiduo = () => api.get('/tipos-residuo');
 export const getTipoResiduo = (id) => api.get(`/tipos-residuo/${id}`);
@@ -65,7 +66,7 @@ export const loadTiposResiduo = async () => {
         `;
     } catch (error) {
         console.error('Error cargando tipos de residuo:', error);
-        showToast(error.message || 'Error al cargar tipos de residuo', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al cargar tipos de residuo');
     }
 };
 
@@ -114,7 +115,7 @@ window.editarTipoResiduo = async (id) => {
         const modal = new bootstrap.Modal(document.getElementById('tipoResiduoModal'));
         modal.show();
     } catch (error) {
-        showToast('Error al cargar tipo de residuo: ' + error.message, 'danger');
+        SwalAlert.error('Error', 'Error al cargar tipo de residuo: ' + error.message);
     }
 };
 
@@ -124,7 +125,7 @@ window.guardarTipoResiduo = async () => {
         const nombre = document.getElementById('tipoResiduoNombre').value.trim();
 
         if (!nombre) {
-            showToast('El nombre es requerido', 'warning');
+            SwalAlert.warning('Advertencia', 'El nombre es requerido');
             return;
         }
 
@@ -132,10 +133,10 @@ window.guardarTipoResiduo = async () => {
 
         if (id && window.tipoResiduoModalMode === 'edit') {
             await updateTipoResiduo(id, data);
-            showToast('Tipo de residuo actualizado correctamente', 'success');
+            SwalAlert.success('Éxito', 'Tipo de residuo actualizado correctamente');
         } else {
             await createTipoResiduo(data);
-            showToast('Tipo de residuo creado correctamente', 'success');
+            SwalAlert.success('Éxito', 'Tipo de residuo creado correctamente');
         }
 
         const modal = bootstrap.Modal.getInstance(document.getElementById('tipoResiduoModal'));
@@ -143,19 +144,20 @@ window.guardarTipoResiduo = async () => {
 
         loadTiposResiduo();
     } catch (error) {
-        showToast(error.message || 'Error al guardar tipo de residuo', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al guardar tipo de residuo');
     }
 };
 
 window.eliminarTipoResiduo = async (id) => {
-    if (!confirm('¿Está seguro de eliminar este tipo de residuo?')) return;
+    const { isConfirmed } = await SwalAlert.confirm('Confirmar eliminación', '¿Está seguro de eliminar este tipo de residuo?');
+    if (!isConfirmed) return;
 
     try {
         await deleteTipoResiduo(id);
-        showToast('Tipo de residuo eliminado correctamente', 'success');
+        SwalAlert.success('Éxito', 'Tipo de residuo eliminado correctamente');
         loadTiposResiduo();
     } catch (error) {
-        showToast(error.message || 'Error al eliminar tipo de residuo', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al eliminar tipo de residuo');
     }
 };
 
@@ -185,7 +187,7 @@ window.buscarTipoResiduo = async () => {
             `).join('');
         }
     } catch (error) {
-        showToast(error.message || 'Error en la búsqueda', 'danger');
+        SwalAlert.error('Error', error.message || 'Error en la búsqueda');
     }
 };
 

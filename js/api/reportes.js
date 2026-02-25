@@ -1,4 +1,5 @@
-import api, { showToast } from './api.js';
+import api from './api.js';
+import { SwalAlert } from '../components/utils.js';
 import { getColonias } from './colonias.js';
 import { getTiposResiduo } from './tiposResiduo.js';
 import { isAdmin, getUser } from '../auth/auth.js';
@@ -119,7 +120,7 @@ export const loadReportes = async () => {
         `;
     } catch (error) {
         console.error('Error cargando reportes:', error);
-        showToast(error.message || 'Error al cargar reportes', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al cargar reportes');
     }
 };
 
@@ -189,7 +190,7 @@ window.guardarReporte = async () => {
         const descripcion = document.getElementById('reporteDescripcion').value.trim();
 
         if (!idColonia) {
-            showToast('La colonia es requerida', 'warning');
+            SwalAlert.warning('Advertencia', 'La colonia es requerida');
             return;
         }
 
@@ -200,33 +201,34 @@ window.guardarReporte = async () => {
         };
 
         await createReporte(data);
-        showToast('Reporte creado correctamente', 'success');
+        SwalAlert.success('Éxito', 'Reporte creado correctamente');
 
         const modal = bootstrap.Modal.getInstance(document.getElementById('reporteModal'));
         modal.hide();
 
         loadReportes();
     } catch (error) {
-        showToast(error.message || 'Error al crear reporte', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al crear reporte');
     }
 };
 
 window.eliminarReporte = async (id) => {
-    if (!confirm('¿Está seguro de eliminar este reporte?')) return;
+    const { isConfirmed } = await SwalAlert.confirm('Confirmar eliminación', '¿Está seguro de eliminar este reporte?');
+    if (!isConfirmed) return;
 
     try {
         await deleteReporte(id);
-        showToast('Reporte eliminado correctamente', 'success');
+        SwalAlert.success('Éxito', 'Reporte eliminado correctamente');
         loadReportes();
     } catch (error) {
-        showToast(error.message || 'Error al eliminar reporte', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al eliminar reporte');
     }
 };
 
 window.cambiarEstadoReporteAction = async (id, estado) => {
     try {
         await cambiarEstadoReporte(id, estado);
-        showToast('Estado actualizado correctamente', 'success');
+        SwalAlert.success('Éxito', 'Estado actualizado correctamente');
         
         if (currentFilter === 'misReportes') {
             window.cargarMisReportes();
@@ -234,7 +236,7 @@ window.cambiarEstadoReporteAction = async (id, estado) => {
             loadReportes();
         }
     } catch (error) {
-        showToast(error.message || 'Error al cambiar estado', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al cambiar estado');
     }
 };
 
@@ -261,7 +263,7 @@ window.cargarMisReportes = async () => {
         }
         document.getElementById('filtroEstadoReporte')?.setAttribute('disabled', 'true');
     } catch (error) {
-        showToast(error.message || 'Error al cargar mis reportes', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al cargar mis reportes');
     }
 };
 
@@ -305,7 +307,7 @@ window.filtrarReportesPorEstado = async () => {
             `).join('');
         }
     } catch (error) {
-        showToast(error.message || 'Error al filtrar reportes', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al filtrar reportes');
     }
 };
 

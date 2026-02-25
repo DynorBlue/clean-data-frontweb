@@ -24,7 +24,7 @@ const requireAuth = () => {
 const requireAdmin = () => {
     if (!requireAuth()) return false;
     if (!isAdmin()) {
-        alert('Acceso restringido solo para administradores');
+        Swal.fire({ icon: 'warning', title: 'Acceso Restringido', text: 'Solo los administradores pueden acceder a esta sección', confirmButtonColor: '#333333' });
         window.location.href = 'index.html';
         return false;
     }

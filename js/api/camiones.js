@@ -1,4 +1,5 @@
-import api, { showToast } from './api.js';
+import api from './api.js';
+import { SwalAlert } from '../components/utils.js';
 
 export const getCamiones = () => api.get('/camiones');
 export const getCamion = (id) => api.get(`/camiones/${id}`);
@@ -68,7 +69,7 @@ export const loadCamiones = async () => {
         `;
     } catch (error) {
         console.error('Error cargando camiones:', error);
-        showToast(error.message || 'Error al cargar camiones', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al cargar camiones');
     }
 };
 
@@ -158,7 +159,7 @@ window.editarCamion = async (id) => {
         const modal = new bootstrap.Modal(document.getElementById('camionModal'));
         modal.show();
     } catch (error) {
-        showToast('Error al cargar camión: ' + error.message, 'danger');
+        SwalAlert.error('Error', 'Error al cargar camión: ' + error.message);
     }
 };
 
@@ -172,7 +173,7 @@ window.guardarCamion = async () => {
         const estado = document.getElementById('camionEstado').value;
         
         if (!placas || !modelo) {
-            showToast('Placas y modelo son requeridos', 'warning');
+            SwalAlert.warning('Advertencia', 'Placas y modelo son requeridos');
             return;
         }
         
@@ -186,10 +187,10 @@ window.guardarCamion = async () => {
         
         if (id && window.camionModalMode === 'edit') {
             await updateCamion(id, data);
-            showToast('Camión actualizado correctamente', 'success');
+            SwalAlert.success('Éxito', 'Camión actualizado correctamente');
         } else {
             await createCamion(data);
-            showToast('Camión creado correctamente', 'success');
+            SwalAlert.success('Éxito', 'Camión creado correctamente');
         }
         
         const modal = bootstrap.Modal.getInstance(document.getElementById('camionModal'));
@@ -197,19 +198,20 @@ window.guardarCamion = async () => {
         
         loadCamiones();
     } catch (error) {
-        showToast(error.message || 'Error al guardar camión', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al guardar camión');
     }
 };
 
 window.eliminarCamion = async (id) => {
-    if (!confirm('¿Está seguro de eliminar este camión?')) return;
+    const { isConfirmed } = await SwalAlert.confirm('Confirmar eliminación', '¿Está seguro de eliminar este camión?');
+    if (!isConfirmed) return;
     
     try {
         await deleteCamion(id);
-        showToast('Camión eliminado correctamente', 'success');
+        SwalAlert.success('Éxito', 'Camión eliminado correctamente');
         loadCamiones();
     } catch (error) {
-        showToast(error.message || 'Error al eliminar camión', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al eliminar camión');
     }
 };
 

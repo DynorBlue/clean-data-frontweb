@@ -1,4 +1,5 @@
-import api, { showToast } from "./api.js";
+import api from "./api.js";
+import { showToast } from "../components/utils.js";
 
 export const getConductores = () => api.get("/conductores");
 export const getConductor = (id) => api.get(`/conductores/${id}`);

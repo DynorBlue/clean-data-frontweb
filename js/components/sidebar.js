@@ -32,6 +32,7 @@ const renderSidebar = () => {
 
     let html = `
         <div class="sidebar-header">
+            <div class="sidebar-logo"></div>
             <h4>Clean Data</h4>
         </div>
         <ul class="nav flex-column">

@@ -1,4 +1,5 @@
-import api, { showToast } from './api.js';
+import api from './api.js';
+import { SwalAlert } from '../components/utils.js';
 import { getCamiones } from './camiones.js';
 
 export const getCamionesGps = () => api.get('/camiones-gps');
@@ -77,7 +78,7 @@ export const loadCamionesGps = async () => {
         `;
     } catch (error) {
         console.error('Error cargando GPS:', error);
-        showToast(error.message || 'Error al cargar GPS de camiones', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al cargar GPS de camiones');
     }
 };
 
@@ -159,7 +160,7 @@ window.editarGps = async (id) => {
         const modal = new bootstrap.Modal(document.getElementById('gpsModal'));
         modal.show();
     } catch (error) {
-        showToast('Error al cargar GPS: ' + error.message, 'danger');
+        SwalAlert.error('Error', 'Error al cargar GPS: ' + error.message);
     }
 };
 
@@ -172,7 +173,7 @@ window.guardarGps = async () => {
         const fechaActualizacion = document.getElementById('gpsFecha').value;
 
         if (!idCamion) {
-            showToast('El camión es requerido', 'warning');
+            SwalAlert.warning('Advertencia', 'El camión es requerido');
             return;
         }
 
@@ -187,10 +188,10 @@ window.guardarGps = async () => {
         const id = document.getElementById('gpsId').value;
         if (id && window.gpsModalMode === 'edit') {
             await updateCamionGps(id, data);
-            showToast('GPS actualizado correctamente', 'success');
+            SwalAlert.success('Éxito', 'GPS actualizado correctamente');
         } else {
             await createCamionGps(data);
-            showToast('GPS creado correctamente', 'success');
+            SwalAlert.success('Éxito', 'GPS creado correctamente');
         }
 
         const modal = bootstrap.Modal.getInstance(document.getElementById('gpsModal'));
@@ -198,19 +199,20 @@ window.guardarGps = async () => {
 
         loadCamionesGps();
     } catch (error) {
-        showToast(error.message || 'Error al guardar GPS', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al guardar GPS');
     }
 };
 
 window.eliminarGps = async (id) => {
-    if (!confirm('¿Está seguro de eliminar este GPS?')) return;
+    const { isConfirmed } = await SwalAlert.confirm('Confirmar eliminación', '¿Está seguro de eliminar este GPS?');
+    if (!isConfirmed) return;
 
     try {
         await deleteCamionGps(id);
-        showToast('GPS eliminado correctamente', 'success');
+        SwalAlert.success('Éxito', 'GPS eliminado correctamente');
         loadCamionesGps();
     } catch (error) {
-        showToast(error.message || 'Error al eliminar GPS', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al eliminar GPS');
     }
 };
 
@@ -241,7 +243,7 @@ window.filtrarGpsPorCamion = async () => {
             `).join('');
         }
     } catch (error) {
-        showToast(error.message || 'Error al filtrar GPS', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al filtrar GPS');
     }
 };
 

@@ -1,4 +1,5 @@
-import api, { showToast } from "./api.js";
+import api from "./api.js";
+import { SwalAlert } from "../components/utils.js";
 
 export const getCiudadanos = () => api.get("/ciudadanos");
 export const getCiudadano = (id) => api.get(`/ciudadanos/${id}`);
@@ -83,7 +84,7 @@ export const loadCiudadanos = async () => {
         `;
   } catch (error) {
     console.error("Error cargando ciudadanos:", error);
-    showToast(error.message || "Error al cargar ciudadanos", "danger");
+    SwalAlert.error("Error", error.message || "Error al cargar ciudadanos");
   }
 };
 
@@ -195,7 +196,7 @@ window.editarCiudadano = async (id) => {
     );
     modal.show();
   } catch (error) {
-    showToast("Error al cargar ciudadano: " + error.message, "danger");
+    SwalAlert.error("Error", "Error al cargar ciudadano: " + error.message);
   }
 };
 
@@ -212,7 +213,7 @@ window.guardarCiudadano = async () => {
     const idColonia = document.getElementById("ciudadanoIdColonia").value;
 
     if (!nombre || !idColonia) {
-      showToast("Nombre y colonia son requeridos", "warning");
+      SwalAlert.warning("Advertencia", "Nombre y colonia son requeridos");
       return;
     }
 
@@ -223,13 +224,10 @@ window.guardarCiudadano = async () => {
         idColonia: parseInt(idColonia),
       };
       await updateCiudadano(id, data);
-      showToast("Ciudadano actualizado correctamente", "success");
+      SwalAlert.success("Éxito", "Ciudadano actualizado correctamente");
     } else {
       if (!email || !password) {
-        showToast(
-          "Email y contraseña son requeridos para nuevo ciudadano",
-          "warning",
-        );
+        SwalAlert.warning("Advertencia", "Email y contraseña son requeridos para nuevo ciudadano");
         return;
       }
       const data = {
@@ -241,7 +239,7 @@ window.guardarCiudadano = async () => {
         idColonia: parseInt(idColonia),
       };
       await registroCiudadano(data);
-      showToast("Ciudadano registrado correctamente", "success");
+      SwalAlert.success("Éxito", "Ciudadano registrado correctamente");
     }
 
     const modal = bootstrap.Modal.getInstance(
@@ -251,19 +249,20 @@ window.guardarCiudadano = async () => {
 
     loadCiudadanos();
   } catch (error) {
-    showToast(error.message || "Error al guardar ciudadano", "danger");
+    SwalAlert.error("Error", error.message || "Error al guardar ciudadano");
   }
 };
 
 window.eliminarCiudadano = async (id) => {
-  if (!confirm("¿Está seguro de eliminar este ciudadano?")) return;
+  const { isConfirmed } = await SwalAlert.confirm("Confirmar eliminación", "¿Está seguro de eliminar este ciudadano?");
+  if (!isConfirmed) return;
 
   try {
     await deleteCiudadano(id);
-    showToast("Ciudadano eliminado correctamente", "success");
+    SwalAlert.success("Éxito", "Ciudadano eliminado correctamente");
     loadCiudadanos();
   } catch (error) {
-    showToast(error.message || "Error al eliminar ciudadano", "danger");
+    SwalAlert.error("Error", error.message || "Error al eliminar ciudadano");
   }
 };
 

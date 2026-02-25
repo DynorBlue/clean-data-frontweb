@@ -1,4 +1,5 @@
-import api, { showToast } from './api.js';
+import api from './api.js';
+import { SwalAlert } from '../components/utils.js';
 
 export const getRecolecciones = () => api.get('/recolecciones');
 export const getRecoleccion = (id) => api.get(`/recolecciones/${id}`);
@@ -84,7 +85,7 @@ export const loadRecolecciones = async () => {
         `;
     } catch (error) {
         console.error('Error cargando recolecciones:', error);
-        showToast(error.message || 'Error al cargar recolecciones', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al cargar recolecciones');
     }
 };
 
@@ -176,7 +177,7 @@ window.editarRecoleccion = async (id) => {
         const modal = new bootstrap.Modal(document.getElementById('recoleccionModal'));
         modal.show();
     } catch (error) {
-        showToast('Error al cargar recolección: ' + error.message, 'danger');
+        SwalAlert.error('Error', 'Error al cargar recolección: ' + error.message);
     }
 };
 
@@ -189,7 +190,7 @@ window.guardarRecoleccion = async () => {
         const pesoKg = document.getElementById('recoleccionPesoKg').value;
         
         if (!idViaje || !idTipoResiduo) {
-            showToast('Viaje y tipo de residuo son requeridos', 'warning');
+            SwalAlert.warning('Advertencia', 'Viaje y tipo de residuo son requeridos');
             return;
         }
         
@@ -202,10 +203,10 @@ window.guardarRecoleccion = async () => {
         
         if (id && window.recoleccionModalMode === 'edit') {
             await updateRecoleccion(id, data);
-            showToast('Recolección actualizada correctamente', 'success');
+            SwalAlert.success('Éxito', 'Recolección actualizada correctamente');
         } else {
             await createRecoleccion(data);
-            showToast('Recolección creada correctamente', 'success');
+            SwalAlert.success('Éxito', 'Recolección creada correctamente');
         }
         
         const modal = bootstrap.Modal.getInstance(document.getElementById('recoleccionModal'));
@@ -213,19 +214,20 @@ window.guardarRecoleccion = async () => {
         
         loadRecolecciones();
     } catch (error) {
-        showToast(error.message || 'Error al guardar recolección', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al guardar recolección');
     }
 };
 
 window.eliminarRecoleccion = async (id) => {
-    if (!confirm('¿Está seguro de eliminar esta recolección?')) return;
+    const { isConfirmed } = await SwalAlert.confirm('Confirmar eliminación', '¿Está seguro de eliminar esta recolección?');
+    if (!isConfirmed) return;
     
     try {
         await deleteRecoleccion(id);
-        showToast('Recolección eliminada correctamente', 'success');
+        SwalAlert.success('Éxito', 'Recolección eliminada correctamente');
         loadRecolecciones();
     } catch (error) {
-        showToast(error.message || 'Error al eliminar recolección', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al eliminar recolección');
     }
 };
 

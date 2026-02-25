@@ -1,3 +1,30 @@
+const SwalAlert = {
+    success: (title, text) => {
+        Swal.fire({ icon: 'success', title, text, confirmButtonColor: '#333333' });
+    },
+    error: (title, text) => {
+        Swal.fire({ icon: 'error', title, text, confirmButtonColor: '#333333' });
+    },
+    warning: (title, text) => {
+        Swal.fire({ icon: 'warning', title, text, confirmButtonColor: '#333333' });
+    },
+    info: (title, text) => {
+        Swal.fire({ icon: 'info', title, text, confirmButtonColor: '#333333' });
+    },
+    confirm: (title, text, confirmText = 'Aceptar', cancelText = 'Cancelar') => {
+        return Swal.fire({
+            icon: 'question',
+            title,
+            text,
+            showCancelButton: true,
+            confirmButtonText: confirmText,
+            cancelButtonText: cancelText,
+            confirmButtonColor: '#333333',
+            cancelButtonColor: '#d9d2c0'
+        });
+    }
+};
+
 const showToast = (message, type = 'success') => {
     const toastContainer = document.getElementById('toastContainer');
     if (!toastContainer) return;
@@ -159,4 +186,4 @@ const getBadgeClass = (enumValue, enumType) => {
     return classes[enumType]?.[enumValue] || 'secondary';
 };
 
-export { showToast, showLoading, showEmptyState, showErrorState, confirmDelete, createModal, formatDate, formatDateTime, getEnumLabel, getBadgeClass };
+export { showToast, showLoading, showEmptyState, showErrorState, confirmDelete, createModal, formatDate, formatDateTime, getEnumLabel, getBadgeClass, SwalAlert };

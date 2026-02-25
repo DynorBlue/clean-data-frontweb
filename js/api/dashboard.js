@@ -1,5 +1,6 @@
 import { isAdmin } from '../auth/auth.js';
-import api, { showToast } from './api.js';
+import api from './api.js';
+import { showToast } from '../components/utils.js';
 import { getColonias } from './colonias.js';
 import { getCamiones } from './camiones.js';
 import { getRutas } from './rutas.js';

@@ -1,4 +1,5 @@
-import api, { showToast } from './api.js';
+import api from './api.js';
+import { SwalAlert } from '../components/utils.js';
 import { getColonias } from './colonias.js';
 import { getTiposResiduo } from './tiposResiduo.js';
 
@@ -93,7 +94,7 @@ export const loadRutas = async () => {
         `;
     } catch (error) {
         console.error('Error cargando rutas:', error);
-        showToast(error.message || 'Error al cargar rutas', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al cargar rutas');
     }
 };
 
@@ -214,7 +215,7 @@ window.editarRuta = async (id) => {
         const modal = new bootstrap.Modal(document.getElementById('rutaModal'));
         modal.show();
     } catch (error) {
-        showToast('Error al cargar ruta: ' + error.message, 'danger');
+        SwalAlert.error('Error', 'Error al cargar ruta: ' + error.message);
     }
 };
 
@@ -226,7 +227,7 @@ window.guardarRuta = async () => {
         const activa = document.getElementById('rutaActiva').checked;
 
         if (!nombre) {
-            showToast('El nombre es requerido', 'warning');
+            SwalAlert.warning('Advertencia', 'El nombre es requerido');
             return;
         }
 
@@ -238,10 +239,10 @@ window.guardarRuta = async () => {
 
         if (id && window.rutaModalMode === 'edit') {
             await updateRuta(id, data);
-            showToast('Ruta actualizada correctamente', 'success');
+            SwalAlert.success('Éxito', 'Ruta actualizada correctamente');
         } else {
             await createRuta(data);
-            showToast('Ruta creada correctamente', 'success');
+            SwalAlert.success('Éxito', 'Ruta creada correctamente');
         }
 
         const modal = bootstrap.Modal.getInstance(document.getElementById('rutaModal'));
@@ -249,19 +250,20 @@ window.guardarRuta = async () => {
 
         loadRutas();
     } catch (error) {
-        showToast(error.message || 'Error al guardar ruta', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al guardar ruta');
     }
 };
 
 window.eliminarRuta = async (id) => {
-    if (!confirm('¿Está seguro de eliminar esta ruta?')) return;
+    const { isConfirmed } = await SwalAlert.confirm('Confirmar eliminación', '¿Está seguro de eliminar esta ruta?');
+    if (!isConfirmed) return;
 
     try {
         await deleteRuta(id);
-        showToast('Ruta eliminada correctamente', 'success');
+        SwalAlert.success('Éxito', 'Ruta eliminada correctamente');
         loadRutas();
     } catch (error) {
-        showToast(error.message || 'Error al eliminar ruta', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al eliminar ruta');
     }
 };
 
@@ -320,13 +322,13 @@ window.agregarColoniaARuta = async () => {
     const fechaRecoleccion = document.getElementById('nuevaColoniaFecha').value;
     
     if (!idColonia) {
-        showToast('Selecciona una colonia', 'warning');
+        SwalAlert.warning('Advertencia', 'Selecciona una colonia');
         return;
     }
     
     try {
         await addColoniaToRuta(rutaColoniasActual, parseInt(idColonia), idTipoResiduo ? parseInt(idTipoResiduo) : null, fechaRecoleccion || null);
-        showToast('Colonia agregada correctamente', 'success');
+        SwalAlert.success('Éxito', 'Colonia agregada correctamente');
         
         const colonias = await getColoniasByRuta(rutaColoniasActual);
         window.cargarTablaColoniasRuta(colonias);
@@ -341,16 +343,17 @@ window.agregarColoniaARuta = async () => {
         document.getElementById('nuevaColoniaTipoResiduo').value = '';
         document.getElementById('nuevaColoniaFecha').value = '';
     } catch (error) {
-        showToast(error.message || 'Error al agregar colonia', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al agregar colonia');
     }
 };
 
 window.eliminarColoniaDeRuta = async (idColonia) => {
-    if (!confirm('¿Eliminar esta colonia de la ruta?')) return;
+    const { isConfirmed } = await SwalAlert.confirm('Confirmar', '¿Eliminar esta colonia de la ruta?');
+    if (!isConfirmed) return;
     
     try {
         await removeColoniaFromRuta(rutaColoniasActual, idColonia);
-        showToast('Colonia eliminada de la ruta', 'success');
+        SwalAlert.success('Éxito', 'Colonia eliminada de la ruta');
         
         const colonias = await getColoniasByRuta(rutaColoniasActual);
         window.cargarTablaColoniasRuta(colonias);
@@ -362,7 +365,7 @@ window.eliminarColoniaDeRuta = async (idColonia) => {
             '<option value="">Seleccionar colonia</option>' + 
             coloniasDisponibles.map(c => `<option value="${c.idColonia}">${c.nombre}</option>`).join('');
     } catch (error) {
-        showToast(error.message || 'Error al eliminar colonia', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al eliminar colonia');
     }
 };
 

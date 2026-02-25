@@ -1,4 +1,5 @@
-import api, { showToast } from './api.js';
+import api from './api.js';
+import { SwalAlert } from '../components/utils.js';
 
 export const getColonias = () => api.get('/colonias');
 export const getColonia = (id) => api.get(`/colonias/${id}`);
@@ -68,7 +69,7 @@ export const loadColonias = async () => {
         `;
     } catch (error) {
         console.error('Error cargando colonias:', error);
-        showToast(error.message || 'Error al cargar colonias', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al cargar colonias');
     }
 };
 
@@ -137,7 +138,7 @@ window.editarColonia = async (id) => {
         const modal = new bootstrap.Modal(document.getElementById('coloniaModal'));
         modal.show();
     } catch (error) {
-        showToast('Error al cargar colonia: ' + error.message, 'danger');
+        SwalAlert.error('Error', 'Error al cargar colonia: ' + error.message);
     }
 };
 
@@ -150,7 +151,7 @@ window.guardarColonia = async () => {
         const longitud = document.getElementById('coloniaLongitud').value;
         
         if (!nombre) {
-            showToast('El nombre es requerido', 'warning');
+            SwalAlert.warning('Advertencia', 'El nombre es requerido');
             return;
         }
         
@@ -163,10 +164,10 @@ window.guardarColonia = async () => {
         
         if (id && window.coloniaModalMode === 'edit') {
             await updateColonia(id, data);
-            showToast('Colonia actualizada correctamente', 'success');
+            SwalAlert.success('Éxito', 'Colonia actualizada correctamente');
         } else {
             await createColonia(data);
-            showToast('Colonia creada correctamente', 'success');
+            SwalAlert.success('Éxito', 'Colonia creada correctamente');
         }
         
         const modal = bootstrap.Modal.getInstance(document.getElementById('coloniaModal'));
@@ -174,23 +175,24 @@ window.guardarColonia = async () => {
         
         loadColonias();
     } catch (error) {
-        showToast(error.message || 'Error al guardar colonia', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al guardar colonia');
     }
 };
 
 window.eliminarColonia = async (id) => {
-    if (!confirm('¿Está seguro de eliminar esta colonia?\n\nNota: Si hay ciudadanos, reportes o rutas asociadas, no se podrá eliminar.')) return;
+    const { isConfirmed } = await SwalAlert.confirm('Confirmar eliminación', '¿Está seguro de eliminar esta colonia?\n\nNota: Si hay ciudadanos, reportes o rutas asociadas, no se podrá eliminar.');
+    if (!isConfirmed) return;
     
     try {
         await deleteColonia(id);
-        showToast('Colonia eliminada correctamente', 'success');
+        SwalAlert.success('Éxito', 'Colonia eliminada correctamente');
         loadColonias();
     } catch (error) {
         console.error('Error al eliminar colonia:', error);
         if (error.message && error.message.includes('foreign key constraint')) {
-            showToast('No se puede eliminar: hay ciudadanos, reportes o rutas asociados a esta colonia', 'warning');
+            SwalAlert.warning('Advertencia', 'No se puede eliminar: hay ciudadanos, reportes o rutas asociados a esta colonia');
         } else {
-            showToast(error.message || 'Error al eliminar colonia. Verifique que no tenga registros asociados.', 'danger');
+            SwalAlert.error('Error', error.message || 'Error al eliminar colonia. Verifique que no tenga registros asociados.');
         }
     }
 };

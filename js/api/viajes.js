@@ -1,4 +1,5 @@
-import api, { showToast } from './api.js';
+import api from './api.js';
+import { SwalAlert } from '../components/utils.js';
 import { getCamiones } from './camiones.js';
 import { getConductores } from './conductores.js';
 import { getRutas } from './rutas.js';
@@ -121,7 +122,7 @@ export const loadViajes = async () => {
         `;
     } catch (error) {
         console.error('Error cargando viajes:', error);
-        showToast(error.message || 'Error al cargar viajes', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al cargar viajes');
     }
 };
 
@@ -245,7 +246,7 @@ window.editarViaje = async (id) => {
         const modal = new bootstrap.Modal(document.getElementById('viajeModal'));
         modal.show();
     } catch (error) {
-        showToast('Error al cargar viaje: ' + error.message, 'danger');
+        SwalAlert.error('Error', 'Error al cargar viaje: ' + error.message);
     }
 };
 
@@ -261,7 +262,7 @@ window.guardarViaje = async () => {
         const estado = document.getElementById('viajeEstado').value;
 
         if (!idCamion || !idConductor || !idRuta || !idTipoResiduo) {
-            showToast('Todos los campos son requeridos', 'warning');
+            SwalAlert.warning('Advertencia', 'Todos los campos son requeridos');
             return;
         }
 
@@ -277,10 +278,10 @@ window.guardarViaje = async () => {
 
         if (id && window.viajeModalMode === 'edit') {
             await updateViaje(id, data);
-            showToast('Viaje actualizado correctamente', 'success');
+            SwalAlert.success('Éxito', 'Viaje actualizado correctamente');
         } else {
             await createViaje(data);
-            showToast('Viaje creado correctamente', 'success');
+            SwalAlert.success('Éxito', 'Viaje creado correctamente');
         }
 
         const modal = bootstrap.Modal.getInstance(document.getElementById('viajeModal'));
@@ -288,41 +289,44 @@ window.guardarViaje = async () => {
 
         loadViajes();
     } catch (error) {
-        showToast(error.message || 'Error al guardar viaje', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al guardar viaje');
     }
 };
 
 window.eliminarViaje = async (id) => {
-    if (!confirm('¿Está seguro de eliminar este viaje?')) return;
+    const { isConfirmed } = await SwalAlert.confirm('Confirmar eliminación', '¿Está seguro de eliminar este viaje?');
+    if (!isConfirmed) return;
 
     try {
         await deleteViaje(id);
-        showToast('Viaje eliminado correctamente', 'success');
+        SwalAlert.success('Éxito', 'Viaje eliminado correctamente');
         loadViajes();
     } catch (error) {
-        showToast(error.message || 'Error al eliminar viaje', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al eliminar viaje');
     }
 };
 
 window.iniciarViajeAction = async (id) => {
-    if (!confirm('¿Iniciar este viaje?')) return;
+    const { isConfirmed } = await SwalAlert.confirm('Confirmar', '¿Iniciar este viaje?');
+    if (!isConfirmed) return;
     try {
         await iniciarViaje(id);
-        showToast('Viaje iniciado correctamente', 'success');
+        SwalAlert.success('Éxito', 'Viaje iniciado correctamente');
         loadViajes();
     } catch (error) {
-        showToast(error.message || 'Error al iniciar viaje', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al iniciar viaje');
     }
 };
 
 window.finalizarViajeAction = async (id) => {
-    if (!confirm('¿Finalizar este viaje?')) return;
+    const { isConfirmed } = await SwalAlert.confirm('Confirmar', '¿Finalizar este viaje?');
+    if (!isConfirmed) return;
     try {
         await finalizarViaje(id);
-        showToast('Viaje finalizado correctamente', 'success');
+        SwalAlert.success('Éxito', 'Viaje finalizado correctamente');
         loadViajes();
     } catch (error) {
-        showToast(error.message || 'Error al finalizar viaje', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al finalizar viaje');
     }
 };
 
@@ -365,7 +369,7 @@ window.filtrarViajesPorEstado = async () => {
             `).join('');
         }
     } catch (error) {
-        showToast(error.message || 'Error al filtrar viajes', 'danger');
+        SwalAlert.error('Error', error.message || 'Error al filtrar viajes');
     }
 };
 
