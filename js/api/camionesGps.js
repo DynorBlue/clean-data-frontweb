@@ -39,6 +39,9 @@ export const loadCamionesGps = async () => {
                     ${camiones.map(c => `<option value="${c.idCamion}">${c.placas} - ${c.modelo}</option>`).join('')}
                 </select>
             </div>
+            <div class="mb-4">
+                <div id="mapaCamiones" style="height: 400px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
+            </div>
             <div class="table-responsive">
                 <table class="table table-striped table-hover">
                     <thead>
@@ -76,9 +79,66 @@ export const loadCamionesGps = async () => {
             </div>
             ${renderGpsModal()}
         `;
+
+        setTimeout(() => initMapa(gpsList), 100);
+
     } catch (error) {
         console.error('Error cargando GPS:', error);
         SwalAlert.error('Error', error.message || 'Error al cargar GPS de camiones');
+    }
+};
+
+let map = null;
+
+const initMapa = (gpsList) => {
+    const mapContainer = document.getElementById('mapaCamiones');
+    if (!mapContainer) return;
+
+    if (map) {
+        map.remove();
+        map = null;
+    }
+
+    const validGps = gpsList.filter(g => g.latitud && g.longitud);
+
+    if (validGps.length === 0) {
+        mapContainer.innerHTML = '<div class="d-flex align-items-center justify-content-center h-100 text-muted">No hay datos de ubicación disponibles</div>';
+        return;
+    }
+
+    map = L.map('mapaCamiones').setView([validGps[0].latitud, validGps[0].longitud], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const defaultIcon = L.icon({
+        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
+    validGps.forEach(g => {
+        const popupContent = `
+            <div style="min-width: 180px;">
+                <h6 class="mb-2"><i class="bi bi-truck"></i> ${g.camion?.placas || 'Sin placas'}</h6>
+                <p class="mb-1"><strong>Modelo:</strong> ${g.camion?.modelo || '-'}</p>
+                <p class="mb-1"><strong>Velocidad:</strong> ${g.velocidad ? g.velocidad + ' km/h' : '-'}</p>
+                <p class="mb-0"><strong>Última actualización:</strong><br>${g.fechaActualizacion ? new Date(g.fechaActualizacion).toLocaleString() : '-'}</p>
+            </div>
+        `;
+
+        L.marker([g.latitud, g.longitud], { icon: defaultIcon })
+            .addTo(map)
+            .bindPopup(popupContent);
+    });
+
+    if (validGps.length > 1) {
+        const bounds = validGps.map(g => [g.latitud, g.longitud]);
+        map.fitBounds(bounds, { padding: [50, 50] });
     }
 };
 
