@@ -60,11 +60,13 @@ export const loadRecolecciones = async () => {
                         </tr>
                     </thead>
                     <tbody>
-                        ${recolecciones.map(r => `
+                        ${recolecciones.map(r => {
+                            const tipoResiduo = tiposResiduoList.find(t => t.idTipo === r.idTipoResiduo);
+                            return `
                             <tr>
                                 <td>${r.idRecoleccion}</td>
                                 <td>${r.idViaje || '-'}</td>
-                                <td>${r.tipoResiduo?.nombre || '-'}</td>
+                                <td>${tipoResiduo?.nombre || '-'}</td>
                                 <td>${r.volumenM3 || '-'}</td>
                                 <td>${r.pesoKg || '-'}</td>
                                 <td>${r.fechaRegistro ? new Date(r.fechaRegistro).toLocaleDateString() : '-'}</td>
@@ -77,12 +79,14 @@ export const loadRecolecciones = async () => {
                                     </button>
                                 </td>
                             </tr>
-                        `).join('')}
+                        `}).join('')}
                     </tbody>
                 </table>
             </div>
             ${renderRecoleccionModal()}
         `;
+        
+        initRecoleccionModal();
     } catch (error) {
         console.error('Error cargando recolecciones:', error);
         SwalAlert.error('Error', error.message || 'Error al cargar recolecciones');
@@ -135,21 +139,45 @@ const renderRecoleccionModal = () => `
     </div>
 `;
 
-window.resetRecoleccionModal = async () => {
+window.resetRecoleccionModal = () => {
     document.getElementById('recoleccionModalTitle').textContent = 'Nueva Recolección';
     document.getElementById('recoleccionId').value = '';
     document.getElementById('recoleccionVolumenM3').value = '';
     document.getElementById('recoleccionPesoKg').value = '';
+    document.getElementById('recoleccionIdViaje').innerHTML = '<option value="">Cargando viajes...</option>';
+    document.getElementById('recoleccionIdTipoResiduo').innerHTML = '<option value="">Cargando tipos...</option>';
+};
+
+const cargarOpcionesModal = async () => {
+    try {
+        const [viajes, tiposResiduo] = await Promise.all([
+            api.get('/viajes'),
+            api.get('/tipos-residuo')
+        ]);
+        
+        document.getElementById('recoleccionIdViaje').innerHTML = '<option value="">Seleccionar viaje...</option>' +
+            viajes.map(v => `<option value="${v.idViaje}">Viaje #${v.idViaje} - ${v.ruta?.nombre || 'Sin ruta'}</option>`).join('');
+        document.getElementById('recoleccionIdTipoResiduo').innerHTML = '<option value="">Seleccionar tipo...</option>' +
+            tiposResiduo.map(t => `<option value="${t.idTipo}">${t.nombre}</option>`).join('');
+    } catch (error) {
+        console.error('Error cargando opciones del modal:', error);
+        SwalAlert.error('Error', 'Error al cargar las opciones');
+    }
+};
+
+const initRecoleccionModal = () => {
+    const modal = document.getElementById('recoleccionModal');
+    if (!modal) return;
     
-    const [viajes, tiposResiduo] = await Promise.all([
-        api.get('/viajes'),
-        api.get('/tipos-residuo')
-    ]);
-    
-    document.getElementById('recoleccionIdViaje').innerHTML = '<option value="">Seleccionar viaje...</option>' +
-        viajes.map(v => `<option value="${v.idViaje}">Viaje #${v.idViaje} - ${v.ruta?.nombre || 'Sin ruta'}</option>`).join('');
-    document.getElementById('recoleccionIdTipoResiduo').innerHTML = '<option value="">Seleccionar tipo...</option>' +
-        tiposResiduo.map(t => `<option value="${t.idTipo}">${t.nombre}</option>`).join('');
+    modal.addEventListener('shown.bs.modal', async () => {
+        const modo = window.recoleccionModalMode;
+        if (modo === 'create') {
+            window.resetRecoleccionModal();
+            await cargarOpcionesModal();
+        } else if (modo === 'edit') {
+            await loadOptions();
+        }
+    });
 };
 
 window.editarRecoleccion = async (id) => {
