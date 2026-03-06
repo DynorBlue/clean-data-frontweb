@@ -36,6 +36,26 @@ export const loadDashboardStats = async () => {
         const viajesEnCurso = viajes.filter(v => v.estado === 'EN_CURSO').length;
         const reportesPendientes = reportes.filter(r => r.estado === 'PENDIENTE').length;
 
+        const reportesPorEstado = {
+            PENDIENTE: reportes.filter(r => r.estado === 'PENDIENTE').length,
+            EN_ATENCION: reportes.filter(r => r.estado === 'EN_ATENCION').length,
+            RESUELTO: reportes.filter(r => r.estado === 'RESUELTO').length
+        };
+
+        const viajesPorEstado = {
+            EN_CURSO: viajes.filter(v => v.estado === 'EN_CURSO').length,
+            FINALIZADO: viajes.filter(v => v.estado === 'FINALIZADO').length,
+            CANCELADO: reportes.filter(r => r.estado === 'CANCELADO').length
+        };
+
+        const rutasActivas = rutas.filter(r => r.activa).length;
+        const rutasInactivas = rutas.filter(r => !r.activa).length;
+
+        const reportesPorTipoResiduo = tiposResiduo.map(t => {
+            const count = reportes.filter(r => r.tipoResiduo?.idTipo === t.idTipo).length;
+            return { nombre: t.nombre, count };
+        });
+
         statsContainer.innerHTML = `
             <div class="row">
                 <div class="col-md-3 mb-3">
@@ -103,6 +123,53 @@ export const loadDashboardStats = async () => {
                     </div>
                 </div>
             </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Estados de Reportes</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="chartReportes"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Estados de Viajes</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="chartViajes"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-2">
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Rutas Activas vs Inactivas</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="chartRutas"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Reportes por Tipo de Residuo</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="chartTiposResiduo"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="row mt-3">
                 <div class="col-md-12">
                     <h4>Resumen de Actividad</h4>
@@ -113,7 +180,7 @@ export const loadDashboardStats = async () => {
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             Rutas Activas
-                            <span class="badge bg-success rounded-pill">${rutas.filter(r => r.activa).length}</span>
+                            <span class="badge bg-success rounded-pill">${rutasActivas}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             Viajes Finalizados
@@ -123,6 +190,88 @@ export const loadDashboardStats = async () => {
                 </div>
             </div>
         `;
+
+        setTimeout(() => {
+            new Chart(document.getElementById('chartReportes'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pendientes', 'En Atención', 'Resueltos'],
+                    datasets: [{
+                        data: [reportesPorEstado.PENDIENTE, reportesPorEstado.EN_ATENCION, reportesPorEstado.RESUELTO],
+                        backgroundColor: ['#ffc107', '#0dcaf0', '#198754'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('chartViajes'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['En Curso', 'Finalizados', 'Cancelados'],
+                    datasets: [{
+                        data: [viajesPorEstado.EN_CURSO, viajesPorEstado.FINALIZADO, viajesPorEstado.CANCELADO],
+                        backgroundColor: ['#ffc107', '#198754', '#dc3545'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('chartRutas'), {
+                type: 'bar',
+                data: {
+                    labels: ['Activas', 'Inactivas'],
+                    datasets: [{
+                        label: 'Cantidad',
+                        data: [rutasActivas, rutasInactivas],
+                        backgroundColor: ['#198754', '#6c757d'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('chartTiposResiduo'), {
+                type: 'bar',
+                data: {
+                    labels: reportesPorTipoResiduo.map(t => t.nombre),
+                    datasets: [{
+                        label: 'Reportes',
+                        data: reportesPorTipoResiduo.map(t => t.count),
+                        backgroundColor: '#ffc107',
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    }
+                }
+            });
+        }, 100);
     } catch (error) {
         console.error('Error cargando estadísticas:', error);
         statsContainer.innerHTML = `
