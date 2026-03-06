@@ -1,129 +1,130 @@
-/* Reset */
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family: 'Segoe UI', Tahoma, sans-serif;
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, sans-serif;
 }
 
-/* Fondo general */
-body{
-    background:#d9d2c0; /* beige claro */
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
+/* FONDO GENERAL */
+body {
+  background: #f4f6f7;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* Contenedor principal */
-.contenedor{
-    width:420px;
-    text-align:center;
+/* CONTENEDOR */
+.contenedor {
+  width: 420px;
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  text-align: center;
 }
 
-/* Logo */
-#logo{
-    width:150px;        /* tamaño más pequeño */
-    height:150px;
-    margin:0 auto 40px auto;
-    background-image:url("../img/logo.png");
-    background-size: contain;  /* que no se deforme */
-    background-repeat:no-repeat;
-    background-position:center;
+/* LOGO */
+#logo {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 25px auto;
+  background-image: url("../img/logo.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
-
-/* Título opcional si lo agregas después */
-.contenedor h1{
-    color:#3d5f0d;
-    font-weight:500;
-    font-size:42px;
-    margin-bottom:40px;
+/* TITULO */
+.contenedor h1 {
+  color: #4caf50; /* verde institucional */
+  font-weight: 600;
+  font-size: 28px;
+  margin-bottom: 30px;
 }
 
-/* Grupo input */
-.datos{
-    display:flex;
-    width:100%;
-    height:55px;              /* altura fija */
-    margin-bottom:20px;
+/* INPUT GROUP */
+.datos {
+  display: flex;
+  width: 100%;
+  height: 50px;
+  margin-bottom: 18px;
 }
 
-.datos input:focus{
-    background:#E0E0E0;
+/* ICONO */
+.icon {
+  width: 50px;
+  background: #e8f5e9; /* verde muy suave */
+  border: 1px solid #dcdcdc;
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* Icono */
-.icon{
-    width:55px;
-    height:100%;
-    background:#e0e0e0;
-    border:1px solid #333;
-    border-right:none;        /* elimina línea del centro */
-    border-radius:20px 0 0 20px; /* redondea solo lado izquierdo */
-    display:flex;
-    justify-content:center;
-    align-items:center;
+.icon img {
+  width: 22px;
+  opacity: 0.7;
 }
 
-.icon img{
-    width:26px;
-    opacity:0.6;
+/* INPUT */
+.datos input {
+  flex: 1;
+  border: 1px solid #dcdcdc;
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  padding-left: 12px;
+  font-size: 15px;
+  outline: none;
 }
 
-/* Input */
-.datos input{
-    flex:1;
-    height:100%;
-    border:1px solid #333;
-    border-left:none;         /* elimina línea del centro */
-    border-radius:0 20px 20px 0; /* redondea lado derecho */
-    background:#e0e0e0;
-    padding-left:0px;
-    font-size:16px;
-    outline:none;
+/* EFECTO FOCUS */
+.datos input:focus {
+  background: #f1f8f4;
+  border-color: #4caf50;
 }
 
-/* Botón */
-button{
-    width:100%;
-    padding:15px;
-    border:none;
-    border-radius:20px;
-    background:#d6b632;
-    color:white;
-    font-size:22px;
-    cursor:pointer;
-    margin-top:10px;
-    transition:0.3s;
-    box-shadow: 0 3px 0 #8f7a1e;
+/* BOTON PRINCIPAL */
+button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background: #4caf50; /* verde principal */
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.25s;
 }
 
-button:hover{
-    background:#c7a82c;
+/* HOVER */
+button:hover {
+  background: #388e3c;
 }
 
-/* Links */
-.link{
-    margin-top:18px;
-    font-size:16px;
-    color:#2c4e8a;
+/* LINK */
+.link {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #616161;
 }
 
-/* Crear cuenta */
-.registro{
-    color:#e67e22;
-    text-decoration: none;
-    cursor:pointer;
+/* REGISTRO */
+.registro {
+  color: #d32f2f; /* rojo suave */
+  text-decoration: none;
+  font-weight: 500;
 }
 
-.registro:hover{
-    text-decoration: underline;
+.registro:hover {
+  text-decoration: underline;
 }
 
-/* Pie de página */
-.pieP{
-    margin-top:60px;
-    color:#888;
-    font-size:14px;
+/* PIE */
+.pieP {
+  margin-top: 35px;
+  color: #9e9e9e;
+  font-size: 13px;
 }

@@ -112,12 +112,12 @@ const initMapa = (gpsList) => {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    const defaultIcon = L.icon({
-        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+    const truckIcon = L.icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/713/713311.png',
         shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32],
         shadowSize: [41, 41]
     });
 
@@ -131,7 +131,7 @@ const initMapa = (gpsList) => {
             </div>
         `;
 
-        L.marker([g.latitud, g.longitud], { icon: defaultIcon })
+        L.marker([g.latitud, g.longitud], { icon: truckIcon })
             .addTo(map)
             .bindPopup(popupContent);
     });
