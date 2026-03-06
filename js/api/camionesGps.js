@@ -42,40 +42,8 @@ export const loadCamionesGps = async () => {
             <div class="mb-4">
                 <div id="mapaCamiones" style="height: 400px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
             </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Camión</th>
-                            <th>Latitud</th>
-                            <th>Longitud</th>
-                            <th>Velocidad</th>
-                            <th>Última Actualización</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${gpsList.map(g => `
-                            <tr>
-                                <td>${g.idCamion}</td>
-                                <td>${g.camion?.placas || '-'}</td>
-                                <td>${g.latitud || '-'}</td>
-                                <td>${g.longitud || '-'}</td>
-                                <td>${g.velocidad ? g.velocidad + ' km/h' : '-'}</td>
-                                <td>${g.fechaActualizacion ? new Date(g.fechaActualizacion).toLocaleString() : '-'}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-warning" onclick="window.editarGps(${g.idCamion})">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger" onclick="window.eliminarGps(${g.idCamion})">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="gpsCardsContainer">
+                ${gpsList.map(g => renderGpsCard(g)).join('')}
             </div>
             ${renderGpsModal()}
         `;
@@ -141,6 +109,44 @@ const initMapa = (gpsList) => {
         map.fitBounds(bounds, { padding: [50, 50] });
     }
 };
+
+const renderGpsCard = (g) => `
+    <div class="col">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-success text-white d-flex align-items-center gap-2">
+                <i class="bi bi-truck"></i>
+                <strong>${g.camion?.placas || 'Sin asignar'}</strong>
+            </div>
+            <div class="card-body">
+                <p class="card-text mb-2">
+                    <i class="bi bi-car-front me-2"></i>
+                    <strong>Modelo:</strong> ${g.camion?.modelo || '-'}
+                </p>
+                <p class="card-text mb-2">
+                    <i class="bi bi-geo-alt me-2"></i>
+                    <strong>Ubicación:</strong> 
+                    ${g.latitud && g.longitud ? `${g.latitud}, ${g.longitud}` : 'Sin datos'}
+                </p>
+                <p class="card-text mb-2">
+                    <i class="bi bi-speedometer2 me-2"></i>
+                    <strong>Velocidad:</strong> ${g.velocidad ? g.velocidad + ' km/h' : '-'}
+                </p>
+                <p class="card-text mb-0">
+                    <i class="bi bi-clock me-2"></i>
+                    <strong>Actualizado:</strong> ${g.fechaActualizacion ? new Date(g.fechaActualizacion).toLocaleString() : '-'}
+                </p>
+            </div>
+            <div class="card-footer bg-transparent">
+                <button class="btn btn-warning btn-sm" onclick="window.editarGps(${g.idCamion})">
+                    <i class="bi bi-pencil"></i> Editar
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="window.eliminarGps(${g.idCamion})">
+                    <i class="bi bi-trash"></i> Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+`;
 
 const renderGpsModal = () => `
     <div class="modal fade" id="gpsModal" tabindex="-1">
@@ -281,26 +287,9 @@ window.filtrarGpsPorCamion = async () => {
     try {
         const gpsList = idCamion ? await getGpsByCamion(idCamion) : await getCamionesGps();
         const gpsData = Array.isArray(gpsList) ? gpsList : [gpsList];
-        const tbody = document.querySelector('#camionesGpsContent table tbody');
-        if (tbody) {
-            tbody.innerHTML = gpsData.map(g => `
-                <tr>
-                    <td>${g.idCamion}</td>
-                    <td>${g.camion?.placas || '-'}</td>
-                    <td>${g.latitud || '-'}</td>
-                    <td>${g.longitud || '-'}</td>
-                    <td>${g.velocidad ? g.velocidad + ' km/h' : '-'}</td>
-                    <td>${g.fechaActualizacion ? new Date(g.fechaActualizacion).toLocaleString() : '-'}</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning" onclick="window.editarGps(${g.idCamion})">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="window.eliminarGps(${g.idCamion})">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+        const container = document.getElementById('gpsCardsContainer');
+        if (container) {
+            container.innerHTML = gpsData.map(g => renderGpsCard(g)).join('');
         }
     } catch (error) {
         SwalAlert.error('Error', error.message || 'Error al filtrar GPS');
