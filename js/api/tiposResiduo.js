@@ -10,6 +10,33 @@ export const buscarTiposResiduo = (query) => api.get(`/tipos-residuo/buscar?q=${
 
 let tiposResiduoData = [];
 
+const renderTipoResiduoCard = (t) => `
+    <div class="col">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-recycle"></i> <strong>Tipo #${t.idTipo}</strong>
+                    <span class="badge bg-light text-dark ms-1">${t.nombre}</span>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-light" onclick="window.editarTipoResiduo(${t.idTipo})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="window.eliminarTipoResiduo(${t.idTipo})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="card-text mb-0">
+                    <i class="bi bi-tag me-2"></i>
+                    <strong>Nombre:</strong> ${t.nombre}
+                </p>
+            </div>
+        </div>
+    </div>
+`;
+
 export const loadTiposResiduo = async () => {
     try {
         const content = document.getElementById('tiposResiduoContent');
@@ -35,32 +62,8 @@ export const loadTiposResiduo = async () => {
                     </button>
                 </div>
             </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${tipos.map(t => `
-                            <tr>
-                                <td>${t.idTipo}</td>
-                                <td>${t.nombre}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-warning" onclick="window.editarTipoResiduo(${t.idTipo})">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger" onclick="window.eliminarTipoResiduo(${t.idTipo})">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="tiposResiduoCardsContainer">
+                ${tipos.map(t => renderTipoResiduoCard(t)).join('')}
             </div>
             ${renderTipoResiduoModal()}
         `;
@@ -169,22 +172,9 @@ window.buscarTipoResiduo = async () => {
     }
     try {
         const tipos = await buscarTiposResiduo(query);
-        const tbody = document.querySelector('#tiposResiduoContent table tbody');
-        if (tbody) {
-            tbody.innerHTML = tipos.map(t => `
-                <tr>
-                    <td>${t.idTipo}</td>
-                    <td>${t.nombre}</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning" onclick="window.editarTipoResiduo(${t.idTipo})">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="window.eliminarTipoResiduo(${t.idTipo})">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+        const container = document.getElementById('tiposResiduoCardsContainer');
+        if (container) {
+            container.innerHTML = tipos.map(t => renderTipoResiduoCard(t)).join('');
         }
     } catch (error) {
         SwalAlert.error('Error', error.message || 'Error en la búsqueda');
