@@ -17,14 +17,66 @@ export const cambiarEstadoReporte = (id, estado) => api.patch(`/reportes/${id}/e
 let reportesData = [];
 let currentFilter = 'todos';
 
-const getEstadoColor = (estado) => {
-    const colors = {
-        'PENDIENTE': 'warning',
-        'EN_ATENCION': 'info',
-        'RESUELTO': 'success'
+const getEstadoBgClass = (estado) => {
+    const bgClasses = {
+        'PENDIENTE': 'bg-warning text-dark',
+        'EN_ATENCION': 'bg-info text-white',
+        'RESUELTO': 'bg-success text-white'
     };
-    return colors[estado] || 'secondary';
+    return bgClasses[estado] || 'bg-secondary';
 };
+
+const renderReporteCard = (r, esAdmin = false) => `
+    <div class="col">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header ${getEstadoBgClass(r.estado)} d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-file-earmark-text"></i> <strong>Reporte #${r.idReporte}</strong>
+                    <span class="badge bg-light text-dark ms-1">${r.estado.replace('_', ' ')}</span>
+                </div>
+                ${esAdmin ? `
+                    <div class="d-flex gap-2">
+                        <div class="dropdown position-static">
+                            <button class="btn btn-sm btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown">
+                                Estado
+                            </button>
+                            <ul class="dropdown-menu" style="z-index: 1050;">
+                                <li><a class="dropdown-item" href="#" onclick="window.cambiarEstadoReporteAction(${r.idReporte}, 'PENDIENTE')">Pendiente</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="window.cambiarEstadoReporteAction(${r.idReporte}, 'EN_ATENCION')">En Atención</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="window.cambiarEstadoReporteAction(${r.idReporte}, 'RESUELTO')">Resuelto</a></li>
+                            </ul>
+                        </div>
+                        <button class="btn btn-sm btn-danger" onclick="window.eliminarReporte(${r.idReporte})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                ` : ''}
+            </div>
+            <div class="card-body">
+                <p class="card-text mb-2">
+                    <i class="bi bi-person me-2"></i>
+                    <strong>Usuario:</strong> ${r.usuario?.email || '-'}
+                </p>
+                <p class="card-text mb-2">
+                    <i class="bi bi-geo-alt me-2"></i>
+                    <strong>Colonia:</strong> ${r.colonia?.nombre || '-'}
+                </p>
+                <p class="card-text mb-2">
+                    <i class="bi bi-recycle me-2"></i>
+                    <strong>Tipo:</strong> ${r.tipoResiduo?.nombre || '-'}
+                </p>
+                <p class="card-text mb-2">
+                    <i class="bi bi-clock me-2"></i>
+                    <strong>Fecha:</strong> ${r.fecha ? new Date(r.fecha).toLocaleString() : '-'}
+                </p>
+                <p class="card-text mb-0">
+                    <i class="bi bi-card-text me-2"></i>
+                    <strong>Descripción:</strong> ${r.descripcion || '-'}
+                </p>
+            </div>
+        </div>
+    </div>
+`;
 
 export const loadReportes = async () => {
     try {
@@ -68,53 +120,8 @@ export const loadReportes = async () => {
                     </select>
                 ` : ''}
             </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Fecha</th>
-                            <th>Usuario</th>
-                            <th>Colonia</th>
-                            <th>Tipo Residuo</th>
-                            <th>Descripción</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${reportes.map(r => `
-                            <tr>
-                                <td>${r.idReporte}</td>
-                                <td>${r.fecha ? new Date(r.fecha).toLocaleString() : '-'}</td>
-                                <td>${r.usuario?.email || '-'}</td>
-                                <td>${r.colonia?.nombre || '-'}</td>
-                                <td>${r.tipoResiduo?.nombre || '-'}</td>
-                                <td>${r.descripcion || '-'}</td>
-                                <td><span class="badge bg-${getEstadoColor(r.estado)}">${r.estado}</span></td>
-                                <td>
-                                    ${esAdmin ? `
-                                        <div class="dropdown d-inline-block">
-                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                                                Estado
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="#" onclick="window.cambiarEstadoReporteAction(${r.idReporte}, 'PENDIENTE')">Pendiente</a></li>
-                                                <li><a class="dropdown-item" href="#" onclick="window.cambiarEstadoReporteAction(${r.idReporte}, 'EN_ATENCION')">En Atención</a></li>
-                                                <li><a class="dropdown-item" href="#" onclick="window.cambiarEstadoReporteAction(${r.idReporte}, 'RESUELTO')">Resuelto</a></li>
-                                            </ul>
-                                        </div>
-                                        <button class="btn btn-sm btn-danger" onclick="window.eliminarReporte(${r.idReporte})">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    ` : `
-                                        <span class="text-muted">Sin acciones</span>
-                                    `}
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="reportesCardsContainer">
+                ${reportes.map(r => renderReporteCard(r, esAdmin)).join('')}
             </div>
             ${renderReporteModal()}
         `;
@@ -244,22 +251,9 @@ window.cargarMisReportes = async () => {
     currentFilter = 'misReportes';
     try {
         const reportes = await getMisReportes();
-        const tbody = document.querySelector('#reportesContent table tbody');
-        if (tbody) {
-            tbody.innerHTML = reportes.map(r => `
-                <tr>
-                    <td>${r.idReporte}</td>
-                    <td>${r.fecha ? new Date(r.fecha).toLocaleString() : '-'}</td>
-                    <td>${r.usuario?.email || '-'}</td>
-                    <td>${r.colonia?.nombre || '-'}</td>
-                    <td>${r.tipoResiduo?.nombre || '-'}</td>
-                    <td>${r.descripcion || '-'}</td>
-                    <td><span class="badge bg-${getEstadoColor(r.estado)}">${r.estado}</span></td>
-                    <td>
-                        <span class="text-muted">Sin acciones</span>
-                    </td>
-                </tr>
-            `).join('');
+        const container = document.getElementById('reportesCardsContainer');
+        if (container) {
+            container.innerHTML = reportes.map(r => renderReporteCard(r, false)).join('');
         }
         document.getElementById('filtroEstadoReporte')?.setAttribute('disabled', 'true');
     } catch (error) {
@@ -272,39 +266,10 @@ window.filtrarReportesPorEstado = async () => {
     currentFilter = estado === 'todos' ? 'todos' : estado;
     try {
         const reportes = estado === 'todos' ? await getReportes() : await getReportesByEstado(estado);
-        const tbody = document.querySelector('#reportesContent table tbody');
+        const container = document.getElementById('reportesCardsContainer');
         const esAdmin = isAdmin();
-        if (tbody) {
-            tbody.innerHTML = reportes.map(r => `
-                <tr>
-                    <td>${r.idReporte}</td>
-                    <td>${r.fecha ? new Date(r.fecha).toLocaleString() : '-'}</td>
-                    <td>${r.usuario?.email || '-'}</td>
-                    <td>${r.colonia?.nombre || '-'}</td>
-                    <td>${r.tipoResiduo?.nombre || '-'}</td>
-                    <td>${r.descripcion || '-'}</td>
-                    <td><span class="badge bg-${getEstadoColor(r.estado)}">${r.estado}</span></td>
-                    <td>
-                        ${esAdmin ? `
-                            <div class="dropdown d-inline-block">
-                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                                    Estado
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#" onclick="window.cambiarEstadoReporteAction(${r.idReporte}, 'PENDIENTE')">Pendiente</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="window.cambiarEstadoReporteAction(${r.idReporte}, 'EN_ATENCION')">En Atención</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="window.cambiarEstadoReporteAction(${r.idReporte}, 'RESUELTO')">Resuelto</a></li>
-                                </ul>
-                            </div>
-                            <button class="btn btn-sm btn-danger" onclick="window.eliminarReporte(${r.idReporte})">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        ` : `
-                            <span class="text-muted">Sin acciones</span>
-                        `}
-                    </td>
-                </tr>
-            `).join('');
+        if (container) {
+            container.innerHTML = reportes.map(r => renderReporteCard(r, esAdmin)).join('');
         }
     } catch (error) {
         SwalAlert.error('Error', error.message || 'Error al filtrar reportes');
