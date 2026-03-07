@@ -16,6 +16,7 @@ export const cambiarEstadoReporte = (id, estado) => api.patch(`/reportes/${id}/e
 
 let reportesData = [];
 let currentFilter = 'todos';
+let mapReportes = null;
 
 const getEstadoBgClass = (estado) => {
     const bgClasses = {
@@ -28,7 +29,7 @@ const getEstadoBgClass = (estado) => {
 
 const renderReporteCard = (r, esAdmin = false) => `
     <div class="col">
-        <div class="card h-100 shadow-sm">
+        <div class="card h-100 shadow-sm" style="cursor: pointer;" onclick="window.seleccionarReporteEnMapa(${r.idReporte})">
             <div class="card-header ${getEstadoBgClass(r.estado)} d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-2">
                     <i class="bi bi-file-earmark-text"></i> <strong>Reporte #${r.idReporte}</strong>
@@ -118,16 +119,123 @@ export const loadReportes = async () => {
                         <option value="EN_ATENCION">En Atención</option>
                         <option value="RESUELTO">Resuelto</option>
                     </select>
+                    <button class="btn btn-success" id="btnMostrarTodosReportes" style="display:none;" onclick="window.mostrarTodosLosReportes()">
+                        <i class="bi bi-eye"></i> Mostrar todos
+                    </button>
                 ` : ''}
+            </div>
+            <div class="mb-4">
+                <div id="mapaReportes" style="height: 400px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
             </div>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="reportesCardsContainer">
                 ${reportes.map(r => renderReporteCard(r, esAdmin)).join('')}
             </div>
             ${renderReporteModal()}
         `;
+
+        setTimeout(() => initMapaReportes(reportes), 100);
+
     } catch (error) {
         console.error('Error cargando reportes:', error);
         SwalAlert.error('Error', error.message || 'Error al cargar reportes');
+    }
+};
+
+const initMapaReportes = (reportes) => {
+    const mapContainer = document.getElementById('mapaReportes');
+    if (!mapContainer) return;
+
+    if (mapReportes) {
+        mapReportes.remove();
+        mapReportes = null;
+    }
+
+    const reportesConCoords = reportes.filter(r => r.colonia?.latitud && r.colonia?.longitud);
+
+    if (reportesConCoords.length === 0) {
+        mapContainer.innerHTML = '<div class="d-flex align-items-center justify-content-center h-100 text-muted">No hay reportes con coordenadas disponibles</div>';
+        return;
+    }
+
+    mapReportes = L.map('mapaReportes').setView([reportesConCoords[0].colonia.latitud, reportesConCoords[0].colonia.longitud], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(mapReportes);
+
+    const coloniaStats = {};
+    const reporteAColonia = {};
+    reportesConCoords.forEach(r => {
+        const idColonia = r.colonia.idColonia;
+        reporteAColonia[r.idReporte] = idColonia;
+        if (!coloniaStats[idColonia]) {
+            coloniaStats[idColonia] = {
+                nombre: r.colonia.nombre,
+                latitud: r.colonia.latitud,
+                longitud: r.colonia.longitud,
+                total: 0,
+                pendiente: 0,
+                enAtencion: 0,
+                resuelto: 0
+            };
+        }
+        coloniaStats[idColonia].total++;
+        if (r.estado === 'PENDIENTE') coloniaStats[idColonia].pendiente++;
+        else if (r.estado === 'EN_ATENCION') coloniaStats[idColonia].enAtencion++;
+        else if (r.estado === 'RESUELTO') coloniaStats[idColonia].resuelto++;
+    });
+
+    const maxReportes = Math.max(...Object.values(coloniaStats).map(c => c.total));
+
+    const circulosReportes = {};
+
+    Object.values(coloniaStats).forEach(c => {
+        const radius = 100 + (c.total / maxReportes) * 400;
+        
+        let fillColor;
+        if (c.pendiente >= c.enAtencion && c.pendiente >= c.resuelto) {
+            fillColor = '#ffc107';
+        } else if (c.enAtencion >= c.pendiente && c.enAtencion >= c.resuelto) {
+            fillColor = '#0dcaf0';
+        } else {
+            fillColor = '#198754';
+        }
+
+        const popupContent = `
+            <div style="min-width: 200px;">
+                <h6 class="mb-2"><i class="bi bi-geo-alt"></i> ${c.nombre}</h6>
+                <p class="mb-1"><strong>Total reportes:</strong> ${c.total}</p>
+                <p class="mb-1"><span class="badge bg-warning text-dark">Pendiente:</span> ${c.pendiente}</p>
+                <p class="mb-1"><span class="badge bg-info text-white">En Atención:</span> ${c.enAtencion}</p>
+                <p class="mb-0"><span class="badge bg-success">Resuelto:</span> ${c.resuelto}</p>
+            </div>
+        `;
+
+        const circulo = L.circle([c.latitud, c.longitud], {
+            radius: radius,
+            fillColor: fillColor,
+            color: '#333',
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.6
+        })
+        .addTo(mapReportes)
+        .bindPopup(popupContent);
+
+        Object.keys(coloniaStats).forEach(idColonia => {
+            if (coloniaStats[idColonia].nombre === c.nombre) {
+                circulosReportes[idColonia] = circulo;
+            }
+        });
+    });
+
+    window.circulosReportes = circulosReportes;
+    window.coloniaStats = coloniaStats;
+    window.reporteAColonia = reporteAColonia;
+
+    const bounds = Object.values(coloniaStats).map(c => [c.latitud, c.longitud]);
+    if (bounds.length > 0) {
+        mapReportes.fitBounds(bounds, { padding: [50, 50] });
     }
 };
 
@@ -249,6 +357,8 @@ window.cambiarEstadoReporteAction = async (id, estado) => {
 
 window.cargarMisReportes = async () => {
     currentFilter = 'misReportes';
+    const btnMostrarTodos = document.getElementById('btnMostrarTodosReportes');
+    if (btnMostrarTodos) btnMostrarTodos.style.display = 'none';
     try {
         const reportes = await getMisReportes();
         const container = document.getElementById('reportesCardsContainer');
@@ -256,6 +366,7 @@ window.cargarMisReportes = async () => {
             container.innerHTML = reportes.map(r => renderReporteCard(r, false)).join('');
         }
         document.getElementById('filtroEstadoReporte')?.setAttribute('disabled', 'true');
+        initMapaReportes(reportes);
     } catch (error) {
         SwalAlert.error('Error', error.message || 'Error al cargar mis reportes');
     }
@@ -264,6 +375,10 @@ window.cargarMisReportes = async () => {
 window.filtrarReportesPorEstado = async () => {
     const estado = document.getElementById('filtroEstadoReporte')?.value;
     currentFilter = estado === 'todos' ? 'todos' : estado;
+    
+    const btnMostrarTodos = document.getElementById('btnMostrarTodosReportes');
+    if (btnMostrarTodos) btnMostrarTodos.style.display = 'none';
+    
     try {
         const reportes = estado === 'todos' ? await getReportes() : await getReportesByEstado(estado);
         const container = document.getElementById('reportesCardsContainer');
@@ -271,9 +386,47 @@ window.filtrarReportesPorEstado = async () => {
         if (container) {
             container.innerHTML = reportes.map(r => renderReporteCard(r, esAdmin)).join('');
         }
+        initMapaReportes(reportes);
     } catch (error) {
         SwalAlert.error('Error', error.message || 'Error al filtrar reportes');
     }
+};
+
+window.seleccionarReporteEnMapa = (idReporte) => {
+    const idColonia = window.reporteAColonia?.[idReporte];
+    const circulos = window.circulosReportes;
+    if (!circulos || !mapReportes || !idColonia) return;
+
+    Object.keys(circulos).forEach(key => {
+        const circulo = circulos[key];
+        if (parseInt(key) === idColonia) {
+            circulo.setStyle({ fillOpacity: 0.8, weight: 3 });
+            mapReportes.setView(circulo.getLatLng(), 15);
+            circulo.openPopup();
+        } else {
+            circulo.setStyle({ fillOpacity: 0.05 });
+        }
+    });
+
+    const btnMostrarTodos = document.getElementById('btnMostrarTodosReportes');
+    if (btnMostrarTodos) btnMostrarTodos.style.display = 'inline-block';
+};
+
+window.mostrarTodosLosReportes = () => {
+    const circulos = window.circulosReportes;
+    if (!circulos || !mapReportes) return;
+
+    Object.values(circulos).forEach(circulo => {
+        circulo.setStyle({ fillOpacity: 0.6, weight: 1 });
+    });
+
+    const bounds = Object.values(circulos).map(c => c.getLatLng());
+    if (bounds.length > 0) {
+        mapReportes.fitBounds(bounds, { padding: [50, 50] });
+    }
+
+    const btnMostrarTodos = document.getElementById('btnMostrarTodosReportes');
+    if (btnMostrarTodos) btnMostrarTodos.style.display = 'none';
 };
 
 window.loadReportes = loadReportes;
