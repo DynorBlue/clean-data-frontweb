@@ -38,6 +38,9 @@ export const loadCamionesGps = async () => {
                     <option value="">Todos los camiones</option>
                     ${camiones.map(c => `<option value="${c.idCamion}">${c.placas} - ${c.modelo}</option>`).join('')}
                 </select>
+                <button class="btn btn-success" id="btnMostrarTodos" style="display:none;" onclick="window.mostrarTodosLosCamiones()">
+                    <i class="bi bi-eye"></i> Mostrar todos
+                </button>
             </div>
             <div class="mb-4">
                 <div id="mapaCamiones" style="height: 400px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
@@ -81,13 +84,15 @@ const initMapa = (gpsList) => {
     }).addTo(map);
 
     const truckIcon = L.icon({
-        iconUrl: 'https://cdn-icons-png.flaticon.com/512/713/713311.png',
+        iconUrl: 'https://cdn-icons-png.flaticon.com/128/11170/11170693.png',
         shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
         iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -16],
         shadowSize: [41, 41]
     });
+
+    const markers = {};
 
     validGps.forEach(g => {
         const popupContent = `
@@ -99,10 +104,12 @@ const initMapa = (gpsList) => {
             </div>
         `;
 
-        L.marker([g.latitud, g.longitud], { icon: truckIcon })
+        markers[g.idCamion] = L.marker([g.latitud, g.longitud], { icon: truckIcon })
             .addTo(map)
             .bindPopup(popupContent);
     });
+
+    window.gpsMarkers = markers;
 
     if (validGps.length > 1) {
         const bounds = validGps.map(g => [g.latitud, g.longitud]);
@@ -112,7 +119,7 @@ const initMapa = (gpsList) => {
 
 const renderGpsCard = (g) => `
     <div class="col">
-        <div class="card h-100 shadow-sm">
+        <div class="card h-100 shadow-sm" style="cursor: pointer;" onclick="window.seleccionarGps(${g.idCamion})">
             <div class="card-header bg-success text-white d-flex align-items-center gap-2">
                 <i class="bi bi-truck"></i>
                 <strong>${g.camion?.placas || 'Sin asignar'}</strong>
@@ -284,6 +291,10 @@ window.eliminarGps = async (id) => {
 
 window.filtrarGpsPorCamion = async () => {
     const idCamion = document.getElementById('filtroCamionGps')?.value;
+    const btnMostrarTodos = document.getElementById('btnMostrarTodos');
+    if (btnMostrarTodos) {
+        btnMostrarTodos.style.display = 'none';
+    }
     try {
         const gpsList = idCamion ? await getGpsByCamion(idCamion) : await getCamionesGps();
         const gpsData = Array.isArray(gpsList) ? gpsList : [gpsList];
@@ -291,9 +302,52 @@ window.filtrarGpsPorCamion = async () => {
         if (container) {
             container.innerHTML = gpsData.map(g => renderGpsCard(g)).join('');
         }
+        initMapa(gpsData);
     } catch (error) {
         SwalAlert.error('Error', error.message || 'Error al filtrar GPS');
     }
+};
+
+window.seleccionarGps = (idCamion) => {
+    const markers = window.gpsMarkers;
+    if (!markers || !map) return;
+
+    Object.keys(markers).forEach(key => {
+        const marker = markers[key];
+        if (parseInt(key) === idCamion) {
+            marker.setOpacity(1);
+            map.setView(marker.getLatLng(), 15);
+            marker.openPopup();
+        } else {
+            marker.setOpacity(0);
+        }
+    });
+
+    const btnMostrarTodos = document.getElementById('btnMostrarTodos');
+    if (btnMostrarTodos) {
+        btnMostrarTodos.style.display = 'inline-block';
+    }
+};
+
+window.mostrarTodosLosCamiones = () => {
+    const markers = window.gpsMarkers;
+    if (!markers || !map) return;
+
+    Object.values(markers).forEach(marker => {
+        marker.setOpacity(1);
+    });
+
+    const bounds = Object.values(markers).map(m => m.getLatLng());
+    if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [50, 50] });
+    }
+
+    const btnMostrarTodos = document.getElementById('btnMostrarTodos');
+    if (btnMostrarTodos) {
+        btnMostrarTodos.style.display = 'none';
+    }
+
+    document.getElementById('filtroCamionGps').value = '';
 };
 
 window.loadCamionesGps = loadCamionesGps;
