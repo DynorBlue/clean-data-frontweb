@@ -56,8 +56,16 @@
 
           try {
             console.log("Intentando login con:", email);
+            const contenedor = document.querySelector('.contenedor');
+            contenedor.style.transition = 'all 0.3s ease';
+            contenedor.style.opacity = '0';
+            contenedor.style.transform = 'scale(0.9)';
+            
             await login(email, password);
-            window.location.href = "../index.html";
+            
+            setTimeout(() => {
+                window.location.href = "../index.html";
+            }, 300);
           } catch (error) {
             console.error("Error:", error);
             Swal.fire({

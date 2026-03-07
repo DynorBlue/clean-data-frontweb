@@ -22,6 +22,18 @@ const login = async (email, password) => {
 };
 
 const logout = () => {
+    const container = document.querySelector('.dashboard-container');
+    if (container) {
+        container.classList.add('animate-fade-out');
+        setTimeout(() => {
+            performLogout();
+        }, 300);
+    } else {
+        performLogout();
+    }
+};
+
+const performLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.location.href = 'html/login.html';

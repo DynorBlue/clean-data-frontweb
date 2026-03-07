@@ -16,6 +16,19 @@ const navigateTo = (moduleId) => {
         moduleId = 'dashboard';
     }
     
+    const mainContent = document.getElementById('mainContent');
+    if (mainContent) {
+        mainContent.classList.add('animate-fade-out');
+        setTimeout(() => {
+            mainContent.classList.remove('animate-fade-out');
+            performNavigation(moduleId);
+        }, 300);
+    } else {
+        performNavigation(moduleId);
+    }
+};
+
+const performNavigation = (moduleId) => {
     const url = new URL(window.location.href);
     url.searchParams.set('module', moduleId);
     window.history.pushState({ module: moduleId }, '', url);
@@ -41,6 +54,17 @@ const initApp = () => {
 
     const user = getUser();
     const userIsAdmin = isAdmin();
+
+    const container = document.getElementById('dashboardContainer');
+    if (container) {
+        container.style.opacity = '0';
+        container.style.transform = 'scale(0.98)';
+        container.style.transition = 'all 0.5s ease';
+        setTimeout(() => {
+            container.style.opacity = '1';
+            container.style.transform = 'scale(1)';
+        }, 50);
+    }
 
     renderSidebar();
     setupNavigation();

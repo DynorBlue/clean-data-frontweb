@@ -189,6 +189,10 @@ const loadContent = async (moduleId) => {
     const module = modules[moduleId];
     if (module) {
         content.innerHTML = await module.render();
+        content.classList.add('animate-slide-up');
+        setTimeout(() => {
+            content.classList.remove('animate-slide-up');
+        }, 500);
         if (module.init) {
             await module.init();
         }
