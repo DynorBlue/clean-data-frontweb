@@ -38,7 +38,7 @@ export const loadRecolecciones = async () => {
         recoleccionesData = recolecciones;
         
         content.innerHTML = `
-            <div class="mb-3">
+            <div class="mb-3 d-flex gap-2 flex-wrap align-items-center">
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#recoleccionModal" onclick="window.recoleccionModalMode='create'; window.resetRecoleccionModal();">
                     <i class="bi bi-plus-circle"></i> Nueva Recolección
                 </button>
@@ -46,42 +46,48 @@ export const loadRecolecciones = async () => {
                     <i class="bi bi-arrow-clockwise"></i> Actualizar
                 </button>
             </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Viaje</th>
-                            <th>Tipo Residuo</th>
-                            <th>Volumen (m³)</th>
-                            <th>Peso (kg)</th>
-                            <th>Fecha</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${recolecciones.map(r => {
+            <div class="table-header-info">
+                <h5><i class="bi bi-trash me-2"></i>Recolecciones</h5>
+                <span class="badge-count">${recolecciones.length} registros</span>
+            </div>
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th><i class="bi bi-hash"></i> ID</th>
+                                <th><i class="bi bi-truck"></i> Viaje</th>
+                                <th><i class="bi bi-recycle"></i> Tipo Residuo</th>
+                                <th><i class="bi bi-box-seam"></i> Volumen (m³)</th>
+                                <th><i class="bi bi-speedometer2"></i> Peso (kg)</th>
+                                <th><i class="bi bi-calendar"></i> Fecha</th>
+                                <th><i class="bi bi-gear"></i> Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${recolecciones.map(r => {
                             const tipoResiduo = tiposResiduoList.find(t => t.idTipo === r.idTipoResiduo);
                             return `
                             <tr>
-                                <td>${r.idRecoleccion}</td>
+                                <td><strong>#${r.idRecoleccion}</strong></td>
                                 <td>${r.idViaje || '-'}</td>
                                 <td>${tipoResiduo?.nombre || '-'}</td>
                                 <td>${r.volumenM3 || '-'}</td>
                                 <td>${r.pesoKg || '-'}</td>
                                 <td>${r.fechaRegistro ? new Date(r.fechaRegistro).toLocaleDateString() : '-'}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-warning" onclick="window.editarRecoleccion(${r.idRecoleccion})">
+                                <td class="table-actions">
+                                    <button class="btn btn-warning btn-sm" onclick="window.editarRecoleccion(${r.idRecoleccion})">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-danger" onclick="window.eliminarRecoleccion(${r.idRecoleccion})">
+                                    <button class="btn btn-danger btn-sm" onclick="window.eliminarRecoleccion(${r.idRecoleccion})">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </td>
                             </tr>
                         `}).join('')}
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             ${renderRecoleccionModal()}
         `;

@@ -27,6 +27,15 @@ const getEstadoBgClass = (estado) => {
     return bgClasses[estado] || 'bg-secondary';
 };
 
+const getReporteBadgeClass = (estado) => {
+    const badges = {
+        'PENDIENTE': 'pendiente',
+        'EN_ATENCION': 'en-atencion',
+        'RESUELTO': 'resuelto'
+    };
+    return badges[estado] || 'inactivo';
+};
+
 const renderReporteCard = (r, esAdmin = false) => `
     <div class="col">
         <div class="card h-100 shadow-sm" style="cursor: pointer;" onclick="window.seleccionarReporteEnMapa(${r.idReporte})">

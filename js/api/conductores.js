@@ -14,6 +14,17 @@ export const getConductoresByEstado = (estado) =>
 
 let conductoresData = [];
 
+const getEstadoConductorBadge = (estado) => {
+  const badges = {
+    'ACTIVO': 'activo',
+    'INACTIVO': 'inactivo',
+    'DISPONIBLE': 'activo',
+    'EN_SERVICIO': 'en-atencion',
+    'EN_RUTA': 'pendiente'
+  };
+  return badges[estado] || 'inactivo';
+};
+
 export const loadConductores = async () => {
   try {
     const content = document.getElementById("conductoresContent");
@@ -26,7 +37,7 @@ export const loadConductores = async () => {
     conductoresData = conductores;
 
     content.innerHTML = `
-            <div class="mb-3">
+            <div class="mb-3 d-flex gap-2 flex-wrap align-items-center">
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#conductorModal" onclick="window.conductorModalMode='create'; window.resetConductorModal();">
                     <i class="bi bi-plus-circle"></i> Nuevo Conductor
                 </button>
@@ -34,37 +45,42 @@ export const loadConductores = async () => {
                     <i class="bi bi-arrow-clockwise"></i> Actualizar
                 </button>
             </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Teléfono</th>
-                            <th>Email</th>
-                            <th>Licencia</th>
-                            <th>Fecha Alta</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            <div class="table-header-info">
+                <h5><i class="bi bi-people me-2"></i>Conductores</h5>
+                <span class="badge-count">${conductores.length} registros</span>
+            </div>
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th><i class="bi bi-hash"></i> ID</th>
+                                <th><i class="bi bi-person"></i> Nombre</th>
+                                <th><i class="bi bi-telephone"></i> Teléfono</th>
+                                <th><i class="bi bi-envelope"></i> Email</th>
+                                <th><i class="bi bi-card-text"></i> Licencia</th>
+                                <th><i class="bi bi-calendar-plus"></i> Fecha Alta</th>
+                                <th><i class="bi bi-info-circle"></i> Estado</th>
+                                <th><i class="bi bi-gear"></i> Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                         ${conductores
                           .map(
                             (c) => `
                             <tr>
-                                <td>${c.idPersona}</td>
-                                <td>${c.persona?.nombre || "-"}</td>
+                                <td><strong>#${c.idPersona}</strong></td>
+                                <td><span class="fw-bold">${c.persona?.nombre || "-"}</span></td>
                                 <td>${c.persona?.telefono || "-"}</td>
                                 <td>${c.persona?.email || "-"}</td>
                                 <td>${c.licencia || "-"}</td>
-                                <td>${c.fechaAlta || "-"}</td>
-                                <td><span class="badge bg-${getEstadoConductorColor(c.estadoOperativo)}">${c.estadoOperativo || "-"}</span></td>
-                                <td>
-                                    <button class="btn btn-sm btn-warning" onclick="window.editarConductor(${c.idPersona})">
+                                <td>${c.fechaAlta ? new Date(c.fechaAlta).toLocaleDateString() : "-"}</td>
+                                <td><span class="badge badge-${getEstadoConductorBadge(c.estadoOperativo)}">${c.estadoOperativo || "-"}</span></td>
+                                <td class="table-actions">
+                                    <button class="btn btn-warning btn-sm" onclick="window.editarConductor(${c.idPersona})">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-danger" onclick="window.eliminarConductor(${c.idPersona})">
+                                    <button class="btn btn-danger btn-sm" onclick="window.eliminarConductor(${c.idPersona})">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </td>
@@ -72,8 +88,9 @@ export const loadConductores = async () => {
                         `,
                           )
                           .join("")}
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             ${renderConductorModal()}
         `;

@@ -22,7 +22,7 @@ export const loadCamiones = async () => {
         camionesData = camiones;
         
         content.innerHTML = `
-            <div class="mb-3">
+            <div class="mb-3 d-flex gap-2 flex-wrap align-items-center">
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#camionModal" onclick="window.camionModalMode='create'; window.resetCamionModal();">
                     <i class="bi bi-plus-circle"></i> Nuevo Camión
                 </button>
@@ -30,40 +30,46 @@ export const loadCamiones = async () => {
                     <i class="bi bi-arrow-clockwise"></i> Actualizar
                 </button>
             </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Placas</th>
-                            <th>Modelo</th>
-                            <th>Capacidad (kg)</th>
-                            <th>Capacidad (m³)</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${camiones.map(c => `
+            <div class="table-header-info">
+                <h5><i class="bi bi-truck me-2"></i>Camiones</h5>
+                <span class="badge-count">${camiones.length} registros</span>
+            </div>
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
                             <tr>
-                                <td>${c.idCamion}</td>
-                                <td>${c.placas}</td>
-                                <td>${c.modelo}</td>
-                                <td>${c.capacidadKg || '-'}</td>
-                                <td>${c.capacidadM3 || '-'}</td>
-                                <td><span class="badge bg-${getEstadoColor(c.estado)}">${c.estado}</span></td>
-                                <td>
-                                    <button class="btn btn-sm btn-warning" onclick="window.editarCamion(${c.idCamion})">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger" onclick="window.eliminarCamion(${c.idCamion})">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
+                                <th><i class="bi bi-hash"></i> ID</th>
+                                <th><i class="bi bi-car-front"></i> Placas</th>
+                                <th><i class="bi bi-car"></i> Modelo</th>
+                                <th><i class="bi bi-speedometer2"></i> Capacidad (kg)</th>
+                                <th><i class="bi bi-box-seam"></i> Capacidad (m³)</th>
+                                <th><i class="bi bi-info-circle"></i> Estado</th>
+                                <th><i class="bi bi-gear"></i> Acciones</th>
                             </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            ${camiones.map(c => `
+                                <tr>
+                                    <td><strong>#${c.idCamion}</strong></td>
+                                    <td><span class="fw-bold">${c.placas}</span></td>
+                                    <td>${c.modelo}</td>
+                                    <td>${c.capacidadKg ? c.capacidadKg.toLocaleString() : '-'}</td>
+                                    <td>${c.capacidadM3 || '-'}</td>
+                                    <td><span class="badge badge-${getEstadoBadge(c.estado)}">${c.estado.replace('_', ' ')}</span></td>
+                                    <td class="table-actions">
+                                        <button class="btn btn-warning btn-sm" onclick="window.editarCamion(${c.idCamion})">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="window.eliminarCamion(${c.idCamion})">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
             </div>
             ${renderCamionModal()}
         `;
@@ -81,6 +87,16 @@ const getEstadoColor = (estado) => {
         'FUERA_DE_SERVICIO': 'danger'
     };
     return colors[estado] || 'secondary';
+};
+
+const getEstadoBadge = (estado) => {
+    const badges = {
+        'DISPONIBLE': 'activo',
+        'EN_MANTENIMIENTO': 'pendiente',
+        'EN_SERVICIO': 'en-atencion',
+        'FUERA_DE_SERVICIO': 'inactivo'
+    };
+    return badges[estado] || 'inactivo';
 };
 
 const renderCamionModal = () => `

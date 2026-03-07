@@ -44,7 +44,7 @@ export const loadRutas = async () => {
         todosTipos = tipos;
 
         content.innerHTML = `
-            <div class="mb-3">
+            <div class="mb-3 d-flex gap-2 flex-wrap align-items-center">
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#rutaModal" onclick="window.rutaModalMode='create'; window.resetRutaModal();">
                     <i class="bi bi-plus-circle"></i> Nueva Ruta
                 </button>
@@ -52,42 +52,48 @@ export const loadRutas = async () => {
                     <i class="bi bi-arrow-clockwise"></i> Actualizar
                 </button>
             </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Descripción</th>
-                            <th>Activa</th>
-                            <th>Colonias</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${rutas.map(r => `
+            <div class="table-header-info">
+                <h5><i class="bi bi-signpost-2 me-2"></i>Rutas</h5>
+                <span class="badge-count">${rutas.length} registros</span>
+            </div>
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
                             <tr>
-                                <td>${r.idRuta}</td>
-                                <td>${r.nombre}</td>
-                                <td>${r.descripcion || '-'}</td>
-                                <td><span class="badge bg-${r.activa ? 'success' : 'secondary'}">${r.activa ? 'Activa' : 'Inactiva'}</span></td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-primary" onclick="window.verColoniasRuta(${r.idRuta}, '${r.nombre.replace(/'/g, "\\'")}')">
-                                        <i class="bi bi-building"></i> Ver
-                                    </button>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-warning" onclick="window.editarRuta(${r.idRuta})">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger" onclick="window.eliminarRuta(${r.idRuta})">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
+                                <th><i class="bi bi-hash"></i> ID</th>
+                                <th><i class="bi bi-signpost"></i> Nombre</th>
+                                <th><i class="bi bi-card-text"></i> Descripción</th>
+                                <th><i class="bi bi-power"></i> Estado</th>
+                                <th><i class="bi bi-building"></i> Colonias</th>
+                                <th><i class="bi bi-gear"></i> Acciones</th>
                             </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            ${rutas.map(r => `
+                                <tr>
+                                    <td><strong>#${r.idRuta}</strong></td>
+                                    <td><span class="fw-bold">${r.nombre}</span></td>
+                                    <td>${r.descripcion || '-'}</td>
+                                    <td><span class="badge badge-${r.activa ? 'activo' : 'inactivo'}">${r.activa ? 'Activa' : 'Inactiva'}</span></td>
+                                    <td>
+                                        <button class="btn btn-outline-primary btn-sm" onclick="window.verColoniasRuta(${r.idRuta}, '${r.nombre.replace(/'/g, "\\'")}')">
+                                            <i class="bi bi-building"></i> Ver
+                                        </button>
+                                    </td>
+                                    <td class="table-actions">
+                                        <button class="btn btn-warning btn-sm" onclick="window.editarRuta(${r.idRuta})">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="window.eliminarRuta(${r.idRuta})">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
             </div>
             ${renderRutaModal()}
             ${renderColoniasRutaModal()}

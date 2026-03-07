@@ -32,6 +32,15 @@ const getEstadoColor = (estado) => {
     return colors[estado] || 'secondary';
 };
 
+const getEstadoBadge = (estado) => {
+    const badges = {
+        'EN_CURSO': 'en-atencion',
+        'FINALIZADO': 'activo',
+        'CANCELADO': 'inactivo'
+    };
+    return badges[estado] || 'inactivo';
+};
+
 export const loadViajes = async () => {
     try {
         const content = document.getElementById('viajesContent');
@@ -68,55 +77,61 @@ export const loadViajes = async () => {
                     <option value="CANCELADO">Cancelado</option>
                 </select>
             </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Camión</th>
-                            <th>Conductor</th>
-                            <th>Ruta</th>
-                            <th>Tipo Residuo</th>
-                            <th>Fecha Inicio</th>
-                            <th>Fecha Fin</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${viajes.map(v => `
+            <div class="table-header-info">
+                <h5><i class="bi bi-truck me-2"></i>Viajes</h5>
+                <span class="badge-count">${viajes.length} registros</span>
+            </div>
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
                             <tr>
-                                <td>${v.idViaje}</td>
-                                <td>${v.camion?.placas || '-'}</td>
-                                <td>${v.conductor?.persona?.nombre || '-'}</td>
-                                <td>${v.ruta?.nombre || '-'}</td>
-                                <td>${v.tipoResiduo?.nombre || '-'}</td>
-                                <td>${v.fechaInicio ? new Date(v.fechaInicio).toLocaleString() : '-'}</td>
-                                <td>${v.fechaFin ? new Date(v.fechaFin).toLocaleString() : '-'}</td>
-                                <td><span class="badge bg-${getEstadoColor(v.estado)}">${v.estado}</span></td>
-                                <td>
-                                    ${v.estado !== 'FINALIZADO' ? `
-                                        ${v.estado !== 'EN_CURSO' ? `
-                                            <button class="btn btn-sm btn-success" onclick="window.iniciarViajeAction(${v.idViaje})" title="Iniciar Viaje">
-                                                <i class="bi bi-play-fill"></i>
-                                            </button>
-                                        ` : `
-                                            <button class="btn btn-sm btn-info" onclick="window.finalizarViajeAction(${v.idViaje})" title="Finalizar Viaje">
-                                                <i class="bi bi-stop-fill"></i>
-                                            </button>
-                                        `}
-                                    ` : ''}
-                                    <button class="btn btn-sm btn-warning" onclick="window.editarViaje(${v.idViaje})">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger" onclick="window.eliminarViaje(${v.idViaje})">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
+                                <th><i class="bi bi-hash"></i> ID</th>
+                                <th><i class="bi bi-car-front"></i> Camión</th>
+                                <th><i class="bi bi-person"></i> Conductor</th>
+                                <th><i class="bi bi-signpost"></i> Ruta</th>
+                                <th><i class="bi bi-recycle"></i> Tipo Residuo</th>
+                                <th><i class="bi bi-play-circle"></i> Inicio</th>
+                                <th><i class="bi bi-stop-circle"></i> Fin</th>
+                                <th><i class="bi bi-info-circle"></i> Estado</th>
+                                <th><i class="bi bi-gear"></i> Acciones</th>
                             </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            ${viajes.map(v => `
+                                <tr>
+                                    <td><strong>#${v.idViaje}</strong></td>
+                                    <td>${v.camion?.placas || '-'}</td>
+                                    <td>${v.conductor?.persona?.nombre || '-'}</td>
+                                    <td>${v.ruta?.nombre || '-'}</td>
+                                    <td>${v.tipoResiduo?.nombre || '-'}</td>
+                                    <td>${v.fechaInicio ? new Date(v.fechaInicio).toLocaleString() : '-'}</td>
+                                    <td>${v.fechaFin ? new Date(v.fechaFin).toLocaleString() : '-'}</td>
+                                    <td><span class="badge badge-${getEstadoBadge(v.estado)}">${v.estado.replace('_', ' ')}</span></td>
+                                    <td class="table-actions">
+                                        ${v.estado !== 'FINALIZADO' ? `
+                                            ${v.estado !== 'EN_CURSO' ? `
+                                                <button class="btn btn-success btn-sm" onclick="window.iniciarViajeAction(${v.idViaje})" title="Iniciar Viaje">
+                                                    <i class="bi bi-play-fill"></i>
+                                                </button>
+                                            ` : `
+                                                <button class="btn btn-info btn-sm" onclick="window.finalizarViajeAction(${v.idViaje})" title="Finalizar Viaje">
+                                                    <i class="bi bi-stop-fill"></i>
+                                                </button>
+                                            `}
+                                        ` : ''}
+                                        <button class="btn btn-warning btn-sm" onclick="window.editarViaje(${v.idViaje})">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="window.eliminarViaje(${v.idViaje})">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
             </div>
             ${renderViajeModal()}
         `;

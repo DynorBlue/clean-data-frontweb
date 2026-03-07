@@ -108,18 +108,44 @@ body {
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
   margin-bottom: 25px;
-  transition: 0.2s;
+  transition: 0.3s ease;
   background: white;
+  overflow: hidden;
 }
 
 .card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+  padding: 12px 20px;
+}
+
+.card-body {
+  padding: 20px;
 }
 
 .card-title {
   font-size: 1.1rem;
   font-weight: 600;
+}
+
+/* Card clickeable */
+.card[style*="cursor: pointer"]:hover {
+  cursor: pointer;
+}
+
+/* Cards en grid */
+#reportesCardsContainer .card,
+#gpsCardsContainer .card {
+  transition: all 0.3s ease;
+}
+
+#reportesCardsContainer .card:hover,
+#gpsCardsContainer .card:hover {
+  border-left: 4px solid #4caf50;
 }
 
 /* ===== BOTONES DASHBOARD ===== */
@@ -158,4 +184,197 @@ body {
   #mainContent {
     height: auto;
   }
+}
+
+/* ===== TABLAS MEJORADAS ===== */
+
+.table-custom {
+  border-radius: 12px;
+  overflow: visible;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  background: white;
+  border: none;
+}
+
+.table-custom thead th {
+  background: #4caf50 !important;
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+  border: none !important;
+  padding: 15px;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.table-custom thead th:first-child {
+  border-top-left-radius: 12px;
+}
+
+.table-custom thead th:last-child {
+  border-top-right-radius: 12px;
+}
+
+.table-custom tbody tr {
+  transition: all 0.3s ease;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.table-custom tbody tr:hover {
+  background: linear-gradient(90deg, rgba(76, 175, 80, 0.08) 0%, rgba(76, 175, 80, 0.02) 100%);
+  transform: translateX(3px);
+}
+
+.table-custom tbody td {
+  padding: 14px 15px;
+  vertical-align: middle;
+  color: #444;
+  font-size: 0.9rem;
+}
+
+.table-custom tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Badge de estado mejorado */
+.badge-estado {
+  padding: 6px 12px;
+  font-weight: 500;
+  font-size: 0.75rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.badge-pendiente {
+  background: linear-gradient(135deg, #ffc107, #ff9800);
+  color: #000;
+}
+
+.badge-en-atencion {
+  background: linear-gradient(135deg, #17a2b8, #0dcaf0);
+  color: #fff;
+}
+
+.badge-resuelto {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: #fff;
+}
+
+.badge-activo {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: #fff;
+}
+
+.badge-inactivo {
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  color: #fff;
+}
+
+/* Contador de registros */
+.table-header-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  border-left: 4px solid #4caf50;
+}
+
+.table-header-info h5 {
+  margin: 0;
+  color: #333;
+  font-weight: 600;
+}
+
+.table-header-info .badge-count {
+  background: #4caf50;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Contenedor de tabla con scroll */
+.table-container {
+  position: relative;
+  border-radius: 12px;
+  overflow: visible;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.table-container .table {
+  margin-bottom: 0;
+}
+
+/* Scrollbar personalizada */
+.table-responsive {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.table-responsive::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #4caf50;
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #388e3c;
+}
+
+/* Botones de acción en tablas */
+.table-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.table-actions .btn {
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.table-actions .btn:hover {
+  transform: scale(1.1);
+}
+
+/* Estado vacío mejorado */
+.empty-state {
+  text-align: center;
+  padding: 50px 20px;
+  color: #6c757d;
+}
+
+.empty-state i {
+  font-size: 4rem;
+  color: #dee2e6;
+  margin-bottom: 15px;
+}
+
+.empty-state h4 {
+  color: #495057;
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  color: #6c757d;
+  margin-bottom: 20px;
 }

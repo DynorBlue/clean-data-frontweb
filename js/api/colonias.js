@@ -24,7 +24,7 @@ export const loadColonias = async () => {
         coloniasData = colonias;
         
         content.innerHTML = `
-            <div class="mb-3">
+            <div class="mb-3 d-flex gap-2 flex-wrap align-items-center">
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#coloniaModal" onclick="window.coloniaModalMode='create'; window.resetColoniaModal();">
                     <i class="bi bi-plus-circle"></i> Nueva Colonia
                 </button>
@@ -32,38 +32,44 @@ export const loadColonias = async () => {
                     <i class="bi bi-arrow-clockwise"></i> Actualizar
                 </button>
             </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Código Postal</th>
-                            <th>Latitud</th>
-                            <th>Longitud</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${colonias.map(c => `
+            <div class="table-header-info">
+                <h5><i class="bi bi-building me-2"></i>Colonias</h5>
+                <span class="badge-count">${colonias.length} registros</span>
+            </div>
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
                             <tr>
-                                <td>${c.idColonia}</td>
-                                <td>${c.nombre}</td>
-                                <td>${c.codigoPostal || '-'}</td>
-                                <td>${c.latitud || '-'}</td>
-                                <td>${c.longitud || '-'}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-warning" onclick="window.editarColonia(${c.idColonia})">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger" onclick="window.eliminarColonia(${c.idColonia})">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
+                                <th><i class="bi bi-hash"></i> ID</th>
+                                <th><i class="bi bi-building"></i> Nombre</th>
+                                <th><i class="bi bi-postcard"></i> Código Postal</th>
+                                <th><i class="bi bi-geo-alt"></i> Latitud</th>
+                                <th><i class="bi bi-geo"></i> Longitud</th>
+                                <th><i class="bi bi-gear"></i> Acciones</th>
                             </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            ${colonias.map(c => `
+                                <tr>
+                                    <td><strong>#${c.idColonia}</strong></td>
+                                    <td><span class="fw-bold">${c.nombre}</span></td>
+                                    <td>${c.codigoPostal || '-'}</td>
+                                    <td>${c.latitud || '-'}</td>
+                                    <td>${c.longitud || '-'}</td>
+                                    <td class="table-actions">
+                                        <button class="btn btn-warning btn-sm" onclick="window.editarColonia(${c.idColonia})">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="window.eliminarColonia(${c.idColonia})">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
             </div>
             ${renderColoniaModal()}
         `;
