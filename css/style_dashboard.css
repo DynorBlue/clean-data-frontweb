@@ -137,6 +137,24 @@ body {
   cursor: pointer;
 }
 
+/* Card de exportación con dropdown visible */
+#dashboardStats .card:last-child {
+  overflow: visible;
+}
+
+#dashboardStats .card:last-child .card-body {
+  overflow: visible;
+}
+
+#dashboardStats .card:last-child .dropdown {
+  overflow: visible;
+}
+
+#dashboardStats .dropdown-menu {
+  position: fixed;
+  z-index: 9999;
+}
+
 /* Cards en grid */
 #reportesCardsContainer .card,
 #gpsCardsContainer .card {
@@ -377,4 +395,93 @@ body {
 .empty-state p {
   color: #6c757d;
   margin-bottom: 20px;
+}
+
+/* ===== BOTONES DE EXPORTACIÓN ===== */
+
+.card-header.bg-dark {
+  background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%) !important;
+}
+
+.card-header.bg-dark h5 {
+  margin: 0;
+  font-weight: 600;
+}
+
+.card-header.bg-dark i {
+  margin-right: 8px;
+}
+
+/* Estilos para botones de exportación en dashboard */
+.btn-success {
+  background: #28a745;
+  border: none;
+}
+
+.btn-success:hover {
+  background: #218838;
+}
+
+.btn-danger {
+  background: #dc3545;
+  border: none;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+}
+
+/* Animación para botones */
+.btn-success:hover, .btn-danger:hover, .btn-outline-success:hover, .btn-outline-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-outline-success, .btn-outline-danger {
+  border-width: 2px;
+}
+
+/* Dropdown de exportación */
+.dropdown-menu {
+  max-height: 350px;
+  overflow-y: auto;
+  z-index: 1050;
+}
+
+.dropdown-menu .dropdown-item {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+.dropdown-menu .dropdown-header {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #6c757d;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 1;
+}
+
+/* Asegurar que dropdowns se muestren correctamente */
+.card-body .dropdown {
+  position: relative;
+}
+
+.card-body .dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.125rem;
+}
+
+.btn-success:hover, .btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

@@ -1,6 +1,7 @@
 import { isAuthenticated, isAdmin, getUser } from './auth/auth.js';
 import { renderSidebar } from './components/sidebar.js';
 import { loadContent, modules } from './components/content.js';
+import './components/exportUtils.js';
 
 const validModules = Object.keys(modules);
 

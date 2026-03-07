@@ -189,7 +189,83 @@ export const loadDashboardStats = async () => {
                     </ul>
                 </div>
             </div>
+
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0"><i class="bi bi-download"></i> Exportar Datos</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <h6 class="fw-bold"><i class="bi bi-database"></i> Exportar Todo</h6>
+                                    <p class="text-muted small">Exporta todos los módulos en un solo archivo.</p>
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        <button class="btn btn-success btn-sm" onclick="window.exportAllDataToExcel()">
+                                            <i class="bi bi-file-earmark-excel"></i> Exportar Todo a Excel
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="window.exportAllDataToPDF()">
+                                            <i class="bi bi-file-earmark-pdf"></i> Exportar Todo a PDF
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <h6 class="fw-bold"><i class="bi bi-collection"></i> Exportar por Módulo</h6>
+                                    <p class="text-muted small">Exporta un módulo específico.</p>
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        <div class="dropdown">
+                                            <button class="btn btn-outline-success btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                                <i class="bi bi-file-earmark-excel"></i> Excel
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><h6 class="dropdown-header">Seleccionar módulo</h6></li>
+                                                <li><a class="dropdown-item" href="#" onclick="window.exportModuleToExcel('colonias')">Colonias</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="window.exportModuleToExcel('camiones')">Camiones</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="window.exportModuleToExcel('conductores')">Conductores</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="window.exportModuleToExcel('rutas')">Rutas</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="window.exportModuleToExcel('viajes')">Viajes</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="window.exportModuleToExcel('recolecciones')">Recolecciones</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="window.exportModuleToExcel('ciudadanos')">Ciudadanos</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="window.exportModuleToExcel('reportes')">Reportes</a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="dropdown">
+                                            <button class="btn btn-outline-danger btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                                <i class="bi bi-file-earmark-pdf"></i> PDF
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><h6 class="dropdown-header">Seleccionar módulo</h6></li>
+                                                <li><a class="dropdown-item" href="#" onclick="window.exportModuleToPDF('colonias')">Colonias</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="window.exportModuleToPDF('camiones')">Camiones</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="window.exportModuleToPDF('conductores')">Conductores</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="window.exportModuleToPDF('rutas')">Rutas</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="window.exportModuleToPDF('viajes')">Viajes</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="window.exportModuleToPDF('recolecciones')">Recolecciones</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="window.exportModuleToPDF('ciudadanos')">Ciudadanos</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="window.exportModuleToPDF('reportes')">Reportes</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         `;
+
+        window.dashboardData = {
+            colonias,
+            camiones,
+            rutas,
+            viajes,
+            conductores,
+            ciudadanos,
+            recolecciones,
+            reportes,
+            tiposResiduo
+        };
 
         setTimeout(() => {
             new Chart(document.getElementById('chartReportes'), {
@@ -319,3 +395,122 @@ const renderBasicDashboard = () => `
         </div>
     </div>
 `;
+
+window.exportAllDataToExcel = () => {
+    const data = window.dashboardData;
+    if (!data) {
+        showToast('Error: Datos no disponibles', 'danger');
+        return;
+    }
+    
+    if (window.exportAllToExcel) {
+        window.exportAllToExcel(data, 'clean_data');
+    } else {
+        showToast('Cargando funciones de exportación...', 'info');
+    }
+};
+
+window.exportAllDataToPDF = () => {
+    const data = window.dashboardData;
+    if (!data) {
+        showToast('Error: Datos no disponibles', 'danger');
+        return;
+    }
+    
+    if (window.exportAllToPDF) {
+        window.exportAllToPDF(data, 'clean_data');
+    } else {
+        showToast('Cargando funciones de exportación...', 'info');
+    }
+};
+
+const moduleConfig = {
+    colonias: { name: 'Colonias', dataKey: 'colonias', columns: ['idColonia', 'nombre', 'codigoPostal', 'latitud', 'longitud'] },
+    camiones: { name: 'Camiones', dataKey: 'camiones', columns: ['idCamion', 'placas', 'modelo', 'capacidadKg', 'capacidadM3', 'estado'] },
+    conductores: { name: 'Conductores', dataKey: 'conductores', columns: ['idPersona', 'persona.nombre', 'persona.telefono', 'persona.email', 'licencia', 'estadoOperativo'] },
+    rutas: { name: 'Rutas', dataKey: 'rutas', columns: ['idRuta', 'nombre', 'descripcion', 'activa'] },
+    viajes: { name: 'Viajes', dataKey: 'viajes', columns: ['idViaje', 'camion.placas', 'conductor.persona.nombre', 'ruta.nombre', 'tipoResiduo.nombre', 'fechaInicio', 'fechaFin', 'estado'] },
+    recolecciones: { name: 'Recolecciones', dataKey: 'recolecciones', columns: ['idRecoleccion', 'idViaje', 'tipoResiduo.nombre', 'volumenM3', 'pesoKg', 'fechaRegistro'] },
+    ciudadanos: { name: 'Ciudadanos', dataKey: 'ciudadanos', columns: ['idPersona', 'persona.nombre', 'persona.telefono', 'persona.email', 'direccionCalle', 'colonia.nombre'] },
+    reportes: { name: 'Reportes', dataKey: 'reportes', columns: ['idReporte', 'usuario.email', 'colonia.nombre', 'tipoResiduo.nombre', 'fecha', 'descripcion', 'estado'] }
+};
+
+window.exportModuleToExcel = (moduleKey) => {
+    const data = window.dashboardData;
+    if (!data) {
+        showToast('Error: Datos no disponibles', 'danger');
+        return;
+    }
+    
+    const config = moduleConfig[moduleKey];
+    if (!config) {
+        showToast('Error: Módulo no válido', 'danger');
+        return;
+    }
+    
+    const moduleData = data[config.dataKey] || [];
+    if (moduleData.length === 0) {
+        showToast('No hay datos para exportar', 'warning');
+        return;
+    }
+    
+    const exportData = moduleData.map(item => {
+        const row = {};
+        config.columns.forEach(col => {
+            const keys = col.split('.');
+            let value = item;
+            keys.forEach(k => {
+                value = value ? value[k] : null;
+            });
+            row[col] = value || '-';
+        });
+        return row;
+    });
+    
+    if (window.exportToExcel) {
+        window.exportToExcel(exportData, config.name.toLowerCase(), config.name);
+    } else {
+        showToast('Cargando funciones de exportación...', 'info');
+    }
+};
+
+window.exportModuleToPDF = (moduleKey) => {
+    const data = window.dashboardData;
+    if (!data) {
+        showToast('Error: Datos no disponibles', 'danger');
+        return;
+    }
+    
+    const config = moduleConfig[moduleKey];
+    if (!config) {
+        showToast('Error: Módulo no válido', 'danger');
+        return;
+    }
+    
+    const moduleData = data[config.dataKey] || [];
+    if (moduleData.length === 0) {
+        showToast('No hay datos para exportar', 'warning');
+        return;
+    }
+    
+    const exportData = moduleData.map(item => {
+        const row = {};
+        config.columns.forEach(col => {
+            const keys = col.split('.');
+            let value = item;
+            keys.forEach(k => {
+                value = value ? value[k] : null;
+            });
+            row[col] = value || '-';
+        });
+        return row;
+    });
+    
+    const columns = config.columns.map(col => ({ header: col, key: col }));
+    
+    if (window.exportToPDF) {
+        window.exportToPDF(exportData, config.name.toLowerCase(), config.name, columns);
+    } else {
+        showToast('Cargando funciones de exportación...', 'info');
+    }
+};
