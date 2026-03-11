@@ -1,5 +1,5 @@
 import api from './api.js';
-import { SwalAlert } from '../components/utils.js';
+import { SwalAlert, handleDeleteError } from '../components/utils.js';
 import { getColonias } from './colonias.js';
 import { getTiposResiduo } from './tiposResiduo.js';
 import { isAdmin, getUser } from '../auth/auth.js';
@@ -345,7 +345,9 @@ window.eliminarReporte = async (id) => {
         SwalAlert.success('Éxito', 'Reporte eliminado correctamente');
         loadReportes();
     } catch (error) {
-        SwalAlert.error('Error', error.message || 'Error al eliminar reporte');
+        if (!handleDeleteError(error, 'el reporte')) {
+            SwalAlert.error('Error', error.message || 'Error al eliminar reporte');
+        }
     }
 };
 

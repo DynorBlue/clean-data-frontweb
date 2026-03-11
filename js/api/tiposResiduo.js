@@ -1,5 +1,5 @@
 import api from './api.js';
-import { SwalAlert } from '../components/utils.js';
+import { SwalAlert, handleDeleteError } from '../components/utils.js';
 
 export const getTiposResiduo = () => api.get('/tipos-residuo');
 export const getTipoResiduo = (id) => api.get(`/tipos-residuo/${id}`);
@@ -160,7 +160,9 @@ window.eliminarTipoResiduo = async (id) => {
         SwalAlert.success('Éxito', 'Tipo de residuo eliminado correctamente');
         loadTiposResiduo();
     } catch (error) {
-        SwalAlert.error('Error', error.message || 'Error al eliminar tipo de residuo');
+        if (!handleDeleteError(error, 'el tipo de residuo')) {
+            SwalAlert.error('Error', error.message || 'Error al eliminar tipo de residuo');
+        }
     }
 };
 

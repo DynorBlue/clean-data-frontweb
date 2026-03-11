@@ -1,5 +1,5 @@
 import api from "./api.js";
-import { SwalAlert } from "../components/utils.js";
+import { SwalAlert, handleDeleteError } from "../components/utils.js";
 
 export const getCiudadanos = () => api.get("/ciudadanos");
 export const getCiudadano = (id) => api.get(`/ciudadanos/${id}`);
@@ -268,7 +268,9 @@ window.eliminarCiudadano = async (id) => {
     SwalAlert.success("Éxito", "Ciudadano eliminado correctamente");
     loadCiudadanos();
   } catch (error) {
-    SwalAlert.error("Error", error.message || "Error al eliminar ciudadano");
+    if (!handleDeleteError(error, 'el ciudadano')) {
+      SwalAlert.error("Error", error.message || "Error al eliminar ciudadano");
+    }
   }
 };
 

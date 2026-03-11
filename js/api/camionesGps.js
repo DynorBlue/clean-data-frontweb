@@ -1,5 +1,5 @@
 import api from './api.js';
-import { SwalAlert } from '../components/utils.js';
+import { SwalAlert, handleDeleteError } from '../components/utils.js';
 import { getCamiones } from './camiones.js';
 
 export const getCamionesGps = () => api.get('/camiones-gps');
@@ -285,7 +285,9 @@ window.eliminarGps = async (id) => {
         SwalAlert.success('Éxito', 'GPS eliminado correctamente');
         loadCamionesGps();
     } catch (error) {
-        SwalAlert.error('Error', error.message || 'Error al eliminar GPS');
+        if (!handleDeleteError(error, 'el GPS')) {
+            SwalAlert.error('Error', error.message || 'Error al eliminar GPS');
+        }
     }
 };
 

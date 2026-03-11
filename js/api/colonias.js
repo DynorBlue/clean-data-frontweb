@@ -1,5 +1,5 @@
 import api from './api.js';
-import { SwalAlert } from '../components/utils.js';
+import { SwalAlert, handleDeleteError } from '../components/utils.js';
 
 export const getColonias = () => api.get('/colonias');
 export const getColonia = (id) => api.get(`/colonias/${id}`);
@@ -195,10 +195,8 @@ window.eliminarColonia = async (id) => {
         loadColonias();
     } catch (error) {
         console.error('Error al eliminar colonia:', error);
-        if (error.message && error.message.includes('foreign key constraint')) {
-            SwalAlert.warning('Advertencia', 'No se puede eliminar: hay ciudadanos, reportes o rutas asociados a esta colonia');
-        } else {
-            SwalAlert.error('Error', error.message || 'Error al eliminar colonia. Verifique que no tenga registros asociados.');
+        if (!handleDeleteError(error, 'la colonia')) {
+            SwalAlert.error('Error', error.message || 'Error al eliminar colonia');
         }
     }
 };

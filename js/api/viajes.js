@@ -1,5 +1,5 @@
 import api from './api.js';
-import { SwalAlert } from '../components/utils.js';
+import { SwalAlert, handleDeleteError } from '../components/utils.js';
 import { getCamiones } from './camiones.js';
 import { getConductores } from './conductores.js';
 import { getRutas } from './rutas.js';
@@ -317,7 +317,9 @@ window.eliminarViaje = async (id) => {
         SwalAlert.success('Éxito', 'Viaje eliminado correctamente');
         loadViajes();
     } catch (error) {
-        SwalAlert.error('Error', error.message || 'Error al eliminar viaje');
+        if (!handleDeleteError(error, 'el viaje')) {
+            SwalAlert.error('Error', error.message || 'Error al eliminar viaje');
+        }
     }
 };
 

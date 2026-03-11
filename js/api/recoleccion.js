@@ -1,5 +1,5 @@
 import api from './api.js';
-import { SwalAlert } from '../components/utils.js';
+import { SwalAlert, handleDeleteError } from '../components/utils.js';
 
 export const getRecolecciones = () => api.get('/recolecciones');
 export const getRecoleccion = (id) => api.get(`/recolecciones/${id}`);
@@ -261,7 +261,9 @@ window.eliminarRecoleccion = async (id) => {
         SwalAlert.success('Éxito', 'Recolección eliminada correctamente');
         loadRecolecciones();
     } catch (error) {
-        SwalAlert.error('Error', error.message || 'Error al eliminar recolección');
+        if (!handleDeleteError(error, 'la recolección')) {
+            SwalAlert.error('Error', error.message || 'Error al eliminar recolección');
+        }
     }
 };
 

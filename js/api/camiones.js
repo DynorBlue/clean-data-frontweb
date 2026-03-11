@@ -1,5 +1,5 @@
 import api from './api.js';
-import { SwalAlert } from '../components/utils.js';
+import { SwalAlert, handleDeleteError } from '../components/utils.js';
 
 export const getCamiones = () => api.get('/camiones');
 export const getCamion = (id) => api.get(`/camiones/${id}`);
@@ -227,7 +227,9 @@ window.eliminarCamion = async (id) => {
         SwalAlert.success('Éxito', 'Camión eliminado correctamente');
         loadCamiones();
     } catch (error) {
-        SwalAlert.error('Error', error.message || 'Error al eliminar camión');
+        if (!handleDeleteError(error, 'el camión')) {
+            SwalAlert.error('Error', error.message || 'Error al eliminar camión');
+        }
     }
 };
 

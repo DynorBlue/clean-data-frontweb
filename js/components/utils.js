@@ -186,4 +186,26 @@ const getBadgeClass = (enumValue, enumType) => {
     return classes[enumType]?.[enumValue] || 'secondary';
 };
 
-export { showToast, showLoading, showEmptyState, showErrorState, confirmDelete, createModal, formatDate, formatDateTime, getEnumLabel, getBadgeClass, SwalAlert };
+const handleDeleteError = (error, entityName = 'registro') => {
+    const errorMessage = error.message?.toLowerCase() || '';
+    const fkPatterns = [
+        'foreign key constraint',
+        'fk_',
+        'constraint',
+        '关联',
+        '外键',
+        'cannot delete',
+        'violates foreign key'
+    ];
+    
+    const isFkError = fkPatterns.some(pattern => errorMessage.includes(pattern.toLowerCase()));
+    
+    if (isFkError) {
+        SwalAlert.warning('No se puede eliminar', `No se puede eliminar ${entityName}: hay registros asociados que dependen de él.`);
+        return true;
+    }
+    
+    return false;
+};
+
+export { showToast, showLoading, showEmptyState, showErrorState, confirmDelete, createModal, formatDate, formatDateTime, getEnumLabel, getBadgeClass, SwalAlert, handleDeleteError };

@@ -1,5 +1,5 @@
 import api from './api.js';
-import { SwalAlert } from '../components/utils.js';
+import { SwalAlert, handleDeleteError } from '../components/utils.js';
 import { getColonias } from './colonias.js';
 import { getTiposResiduo } from './tiposResiduo.js';
 
@@ -269,7 +269,9 @@ window.eliminarRuta = async (id) => {
         SwalAlert.success('Éxito', 'Ruta eliminada correctamente');
         loadRutas();
     } catch (error) {
-        SwalAlert.error('Error', error.message || 'Error al eliminar ruta');
+        if (!handleDeleteError(error, 'la ruta')) {
+            SwalAlert.error('Error', error.message || 'Error al eliminar ruta');
+        }
     }
 };
 

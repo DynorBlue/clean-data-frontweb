@@ -1,5 +1,5 @@
 import api from "./api.js";
-import { showToast } from "../components/utils.js";
+import { SwalAlert, handleDeleteError } from "../components/utils.js";
 
 export const getConductores = () => api.get("/conductores");
 export const getConductor = (id) => api.get(`/conductores/${id}`);
@@ -96,7 +96,7 @@ export const loadConductores = async () => {
         `;
   } catch (error) {
     console.error("Error cargando conductores:", error);
-    showToast(error.message || "Error al cargar conductores", "danger");
+    SwalAlert.error("Error", error.message || "Error al cargar conductores");
   }
 };
 
@@ -210,7 +210,7 @@ window.editarConductor = async (id) => {
     );
     modal.show();
   } catch (error) {
-    showToast("Error al cargar conductor: " + error.message, "danger");
+    SwalAlert.error("Error", "Error al cargar conductor: " + error.message);
   }
 };
 
@@ -226,7 +226,7 @@ window.guardarConductor = async () => {
     const estado = document.getElementById("conductorEstado").value;
 
     if (!nombre || !licencia) {
-      showToast("Nombre y licencia son requeridos", "warning");
+      SwalAlert.warning("Advertencia", "Nombre y licencia son requeridos");
       return;
     }
 
@@ -240,13 +240,10 @@ window.guardarConductor = async () => {
         persona,
       };
       await updateConductor(id, data);
-      showToast("Conductor actualizado correctamente", "success");
+      SwalAlert.success("Éxito", "Conductor actualizado correctamente");
     } else {
       if (!email || !password) {
-        showToast(
-          "Email y contraseña son requeridos para nuevo conductor",
-          "warning",
-        );
+        SwalAlert.warning("Advertencia", "Email y contraseña son requeridos para nuevo conductor");
         return;
       }
       const data = {
@@ -258,7 +255,7 @@ window.guardarConductor = async () => {
         fechaAlta: fechaAlta || null,
       };
       await registroConductor(data);
-      showToast("Conductor registrado correctamente", "success");
+      SwalAlert.success("Éxito", "Conductor registrado correctamente");
     }
 
     const modal = bootstrap.Modal.getInstance(
@@ -268,19 +265,22 @@ window.guardarConductor = async () => {
 
     loadConductores();
   } catch (error) {
-    showToast(error.message || "Error al guardar conductor", "danger");
+    SwalAlert.error("Error", error.message || "Error al guardar conductor");
   }
 };
 
 window.eliminarConductor = async (id) => {
-  if (!confirm("¿Está seguro de eliminar este conductor?")) return;
+  const { isConfirmed } = await SwalAlert.confirm("Confirmar eliminación", "¿Está seguro de eliminar este conductor?");
+  if (!isConfirmed) return;
 
   try {
     await deleteConductor(id);
-    showToast("Conductor eliminado correctamente", "success");
+    SwalAlert.success("Éxito", "Conductor eliminado correctamente");
     loadConductores();
   } catch (error) {
-    showToast(error.message || "Error al eliminar conductor", "danger");
+    if (!handleDeleteError(error, "el conductor")) {
+      SwalAlert.error("Error", error.message || "Error al eliminar conductor");
+    }
   }
 };
 
