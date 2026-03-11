@@ -182,9 +182,22 @@ const modules = {
     }
 };
 
+const cleanupModals = () => {
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+    document.querySelectorAll('.modal.show').forEach(modalEl => {
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+    });
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+};
+
 const loadContent = async (moduleId) => {
     const content = document.getElementById('mainContent');
     if (!content) return;
+
+    cleanupModals();
 
     const module = modules[moduleId];
     if (module) {

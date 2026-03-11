@@ -151,8 +151,8 @@ body {
 }
 
 #dashboardStats .dropdown-menu {
-  position: fixed;
-  z-index: 9999;
+  position: absolute;
+  z-index: 1050;
 }
 
 /* Cards en grid */
@@ -690,4 +690,44 @@ body {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
+}
+
+/* ===== CORRECCIÓN MODALES ===== */
+
+.modal {
+  z-index: 1060 !important;
+  pointer-events: auto !important;
+}
+
+.modal-backdrop {
+  display: none !important;
+}
+
+.modal-dialog {
+  z-index: 1060 !important;
+  pointer-events: auto !important;
+}
+
+.modal-content {
+  pointer-events: auto !important;
+}
+
+.modal-body {
+  pointer-events: auto !important;
+}
+
+.modal.show {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+body.modal-open {
+  overflow: auto !important;
+  padding-right: 0 !important;
+}
+
+body.modal-open .dashboard-container {
+  pointer-events: auto;
+  filter: none;
 }
