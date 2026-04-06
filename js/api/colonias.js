@@ -10,6 +10,7 @@ export const deleteColonia = (id) => api.delete(`/colonias/${id}`);
 export const buscarColoniasPorCP = (cp) => api.get(`/colonias/cp/${cp}`);
 export const buscarColoniasPorNombre = (nombre) => api.get(`/colonias/buscar?nombre=${encodeURIComponent(nombre)}`);
 export const buscarColoniasContiene = (query) => api.get(`/colonias/buscar/contiene?q=${encodeURIComponent(query)}`);
+export const checkColoniaDependencias = (id) => api.get(`/colonias/${id}/dependencias`);
 
 let coloniasData = [];
 
@@ -186,16 +187,35 @@ window.guardarColonia = async () => {
 };
 
 window.eliminarColonia = async (id) => {
-    const { isConfirmed } = await SwalAlert.confirm('Confirmar eliminación', '¿Está seguro de eliminar esta colonia?\n\nNota: Si hay ciudadanos, reportes o rutas asociadas, no se podrá eliminar.');
+    const { isConfirmed } = await SwalAlert.confirm('Confirmar eliminación', '¿Está seguro de eliminar esta colonia?');
     if (!isConfirmed) return;
-    
+
     try {
+        const deps = await checkColoniaDependencias(id);
+        
+        if (!deps.puedeEliminarse) {
+            const mensajeLines = deps.mensaje.split('\n').filter(line => line.trim())
+                .map(line => `<div>${line}</div>`).join('');
+            SwalAlert.warning(
+                'No se puede eliminar',
+                `<strong>Colonia: ${deps.nombreColonia}</strong><br><br>${mensajeLines}`
+            );
+            return;
+        }
+        
         await deleteColonia(id);
         SwalAlert.success('Éxito', 'Colonia eliminada correctamente');
         loadColonias();
     } catch (error) {
-        console.error('Error al eliminar colonia:', error);
-        if (!handleDeleteError(error, 'la colonia')) {
+        if (error.response?.status === 400 && error.response?.data?.mensaje) {
+            const deps = error.response.data;
+            const mensajeLines = deps.mensaje.split('\n').filter(line => line.trim())
+                .map(line => `<div>${line}</div>`).join('');
+            SwalAlert.warning(
+                'No se puede eliminar',
+                `<strong>Colonia: ${deps.nombreColonia}</strong><br><br>${mensajeLines}`
+            );
+        } else if (!handleDeleteError(error, 'la colonia')) {
             SwalAlert.error('Error', error.message || 'Error al eliminar colonia');
         }
     }

@@ -1,21 +1,21 @@
 const SwalAlert = {
     success: (title, text) => {
-        Swal.fire({ icon: 'success', title, text, confirmButtonColor: '#333333' });
+        Swal.fire({ icon: 'success', title, html: text, confirmButtonColor: '#333333' });
     },
     error: (title, text) => {
-        Swal.fire({ icon: 'error', title, text, confirmButtonColor: '#333333' });
+        Swal.fire({ icon: 'error', title, html: text, confirmButtonColor: '#333333' });
     },
     warning: (title, text) => {
-        Swal.fire({ icon: 'warning', title, text, confirmButtonColor: '#333333' });
+        Swal.fire({ icon: 'warning', title, html: text, confirmButtonColor: '#333333' });
     },
     info: (title, text) => {
-        Swal.fire({ icon: 'info', title, text, confirmButtonColor: '#333333' });
+        Swal.fire({ icon: 'info', title, html: text, confirmButtonColor: '#333333' });
     },
     confirm: (title, text, confirmText = 'Aceptar', cancelText = 'Cancelar') => {
         return Swal.fire({
             icon: 'question',
             title,
-            text,
+            html: text,
             showCancelButton: true,
             confirmButtonText: confirmText,
             cancelButtonText: cancelText,

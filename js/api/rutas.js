@@ -14,13 +14,14 @@ export const getResiduoHoy = () => api.get('/rutas/residuo-hoy');
 
 export const addColoniaToRuta = (idRuta, idColonia, idTipoResiduo, fechaRecoleccion) => 
     api.post(`/rutas/${idRuta}/colonias`, { 
-        colonia: { idColonia: parseInt(idColonia) },
-        tipoResiduo: idTipoResiduo ? { idTipo: parseInt(idTipoResiduo) } : null,
+        idColonia: parseInt(idColonia),
+        idTipoResiduo: idTipoResiduo ? parseInt(idTipoResiduo) : null,
         fechaRecoleccion: fechaRecoleccion || null
     });
 
 export const getColoniasByRuta = (idRuta) => api.get(`/rutas/${idRuta}/colonias`);
 export const removeColoniaFromRuta = (idRuta, idColonia) => api.delete(`/rutas/${idRuta}/colonias/${idColonia}`);
+export const checkRutaDependencias = (id) => api.get(`/rutas/${id}/dependencias`);
 
 let rutasData = [];
 let todasColonias = [];
@@ -265,11 +266,29 @@ window.eliminarRuta = async (id) => {
     if (!isConfirmed) return;
 
     try {
+        const deps = await checkRutaDependencias(id);
+        
+        if (!deps.puedeEliminarse) {
+            const mensajeLines = deps.mensaje.split('\n').filter(line => line.trim()).map(line => `<div>${line}</div>`).join('');
+            SwalAlert.warning(
+                'No se puede eliminar',
+                `<strong>Ruta: ${deps.nombreRuta}</strong><br><br>${mensajeLines}`
+            );
+            return;
+        }
+        
         await deleteRuta(id);
         SwalAlert.success('Éxito', 'Ruta eliminada correctamente');
         loadRutas();
     } catch (error) {
-        if (!handleDeleteError(error, 'la ruta')) {
+        if (error.response?.status === 400 && error.response?.data?.mensaje) {
+            const deps = error.response.data;
+            const mensajeLines = deps.mensaje.split('\n').filter(line => line.trim()).map(line => `<div>${line}</div>`).join('');
+            SwalAlert.warning(
+                'No se puede eliminar',
+                `<strong>Ruta: ${deps.nombreRuta}</strong><br><br>${mensajeLines}`
+            );
+        } else if (!handleDeleteError(error, 'la ruta')) {
             SwalAlert.error('Error', error.message || 'Error al eliminar ruta');
         }
     }
