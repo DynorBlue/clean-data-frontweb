@@ -323,7 +323,10 @@ window.cargarTablaColoniasRuta = (colonias) => {
 };
 
 window.agregarColoniaARuta = async () => {
-    if (!rutaColoniasActual) return;
+    if (!rutaColoniasActual) {
+        SwalAlert.error('Error', 'No hay ruta seleccionada');
+        return;
+    }
     
     const idColonia = document.getElementById('nuevaColoniaRuta').value;
     const idTipoResiduo = document.getElementById('nuevaColoniaTipoResiduo').value;
@@ -333,6 +336,13 @@ window.agregarColoniaARuta = async () => {
         SwalAlert.warning('Advertencia', 'Selecciona una colonia');
         return;
     }
+    
+    console.log('Agregando colonia:', {
+        ruta: rutaColoniasActual,
+        colonia: idColonia,
+        tipoResiduo: idTipoResiduo,
+        fecha: fechaRecoleccion
+    });
     
     try {
         await addColoniaToRuta(rutaColoniasActual, parseInt(idColonia), idTipoResiduo ? parseInt(idTipoResiduo) : null, fechaRecoleccion || null);
