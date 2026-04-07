@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inicio de Sesión - Clean Data</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
+    <link rel="stylesheet" href="../css/style_login.css" />
+  </head>
+  <body>
+    <div class="contenedor">
+      <div id="logo"></div>
+      <div class="datos">
+        <div class="icon">
+          <img src="../img/user.png" alt="" />
+        </div>
+        <input type="text" id="email" placeholder="Correo electrónico" />
+      </div>
+      <div class="datos">
+        <div class="icon">
+          <img src="../img/candadoO.png" alt="" />
+        </div>
+        <input type="password" id="password" placeholder="Contraseña" />
+      </div>
+      <button id="loginBtn">Iniciar sesión</button>
+      <p class="pieP">Powered by DynorBlue</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+      import { login } from "../js/auth/login.js";
+
+      document
+        .getElementById("loginBtn")
+        .addEventListener("click", async () => {
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+
+          if (!email || !password) {
+            Swal.fire({
+              icon: "warning",
+              title: "Campos requeridos",
+              text: "Por favor ingresa email y contraseña",
+              confirmButtonColor: "#333333",
+            });
+            return;
+          }
+
+          try {
+            console.log("Intentando login con:", email);
+            const contenedor = document.querySelector('.contenedor');
+            contenedor.style.transition = 'all 0.3s ease';
+            contenedor.style.opacity = '0';
+            contenedor.style.transform = 'scale(0.9)';
+            
+            await login(email, password);
+            
+            setTimeout(() => {
+                window.location.href = "../index.html";
+            }, 300);
+          } catch (error) {
+            console.error("Error:", error);
+            Swal.fire({
+              icon: "error",
+              title: "Error de autenticación",
+              text: "Credenciales incorrectas. Por favor verifica tu email y contraseña.",
+              confirmButtonColor: "#333333",
+            });
+          }
+        });
+    </script>
+  </body>
+</html>
