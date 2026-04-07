@@ -134,6 +134,10 @@ const renderRecoleccionModal = () => `
                                 <input type="number" step="0.01" class="form-control" id="recoleccionPesoKg">
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Fecha de Registro</label>
+                            <input type="datetime-local" class="form-control" id="recoleccionFechaRegistro">
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -150,6 +154,7 @@ window.resetRecoleccionModal = () => {
     document.getElementById('recoleccionId').value = '';
     document.getElementById('recoleccionVolumenM3').value = '';
     document.getElementById('recoleccionPesoKg').value = '';
+    document.getElementById('recoleccionFechaRegistro').value = '';
     document.getElementById('recoleccionIdViaje').innerHTML = '<option value="">Cargando viajes...</option>';
     document.getElementById('recoleccionIdTipoResiduo').innerHTML = '<option value="">Cargando tipos...</option>';
 };
@@ -206,6 +211,15 @@ window.editarRecoleccion = async (id) => {
         document.getElementById('recoleccionVolumenM3').value = recoleccion.volumenM3 || '';
         document.getElementById('recoleccionPesoKg').value = recoleccion.pesoKg || '';
         
+        const fechaRegistro = recoleccion.fechaRegistro ? new Date(recoleccion.fechaRegistro) : null;
+        if (fechaRegistro) {
+            const offset = fechaRegistro.getTimezoneOffset();
+            fechaRegistro.setMinutes(fechaRegistro.getMinutes() - offset);
+            document.getElementById('recoleccionFechaRegistro').value = fechaRegistro.toISOString().slice(0, 16);
+        } else {
+            document.getElementById('recoleccionFechaRegistro').value = '';
+        }
+        
         window.recoleccionModalMode = 'edit';
         
         const modal = new bootstrap.Modal(document.getElementById('recoleccionModal'));
@@ -222,6 +236,7 @@ window.guardarRecoleccion = async () => {
         const idTipoResiduo = document.getElementById('recoleccionIdTipoResiduo').value;
         const volumenM3 = document.getElementById('recoleccionVolumenM3').value;
         const pesoKg = document.getElementById('recoleccionPesoKg').value;
+        const fechaRegistro = document.getElementById('recoleccionFechaRegistro').value;
         
         if (!idViaje || !idTipoResiduo) {
             SwalAlert.warning('Advertencia', 'Viaje y tipo de residuo son requeridos');
@@ -232,7 +247,8 @@ window.guardarRecoleccion = async () => {
             idViaje: parseInt(idViaje),
             idTipoResiduo: parseInt(idTipoResiduo),
             volumenM3: volumenM3 ? parseFloat(volumenM3) : null,
-            pesoKg: pesoKg ? parseFloat(pesoKg) : null
+            pesoKg: pesoKg ? parseFloat(pesoKg) : null,
+            fechaRegistro: fechaRegistro ? new Date(fechaRegistro).toISOString() : null
         };
         
         if (id && window.recoleccionModalMode === 'edit') {
