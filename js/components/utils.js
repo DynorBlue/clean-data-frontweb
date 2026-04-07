@@ -195,13 +195,16 @@ const handleDeleteError = (error, entityName = 'registro') => {
         '关联',
         '外键',
         'cannot delete',
-        'violates foreign key'
+        'violates foreign key',
+        'asociado a uno o más',
+        'asociado a un dispositivo gps',
+        'no se puede eliminar'
     ];
     
     const isFkError = fkPatterns.some(pattern => errorMessage.includes(pattern.toLowerCase()));
     
     if (isFkError) {
-        SwalAlert.warning('No se puede eliminar', `No se puede eliminar ${entityName}: hay registros asociados que dependen de él.`);
+        SwalAlert.warning('No se puede eliminar', error.message || `No se puede eliminar ${entityName}: hay registros asociados que dependen de él.`);
         return true;
     }
     

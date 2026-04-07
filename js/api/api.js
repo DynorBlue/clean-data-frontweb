@@ -84,7 +84,8 @@ async function handleResponse(response) {
         throw new Error('Recurso no encontrado');
     }
     if (response.status >= 500) {
-        throw new Error('Error del servidor. Intenta más tarde.');
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Error del servidor. Intenta más tarde.');
     }
     
     const contentType = response.headers.get('content-type');

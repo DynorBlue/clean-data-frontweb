@@ -282,10 +282,10 @@ window.guardarViaje = async () => {
         }
 
         const data = {
-            camion: { idCamion: parseInt(idCamion) },
-            conductor: { idPersona: parseInt(idConductor) },
-            ruta: { idRuta: parseInt(idRuta) },
-            tipoResiduo: { idTipo: parseInt(idTipoResiduo) },
+            idCamion: parseInt(idCamion),
+            idConductor: parseInt(idConductor),
+            idRuta: parseInt(idRuta),
+            idTipoResiduo: parseInt(idTipoResiduo),
             fechaInicio: fechaInicio || null,
             fechaFin: fechaFin || null,
             estado
