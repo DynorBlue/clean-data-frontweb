@@ -230,14 +230,13 @@ window.guardarConductor = async () => {
       return;
     }
 
-    const persona = { nombre, telefono: telefono || null };
-
     if (id && window.conductorModalMode === "edit") {
       const data = {
+        nombre,
+        telefono: telefono || null,
         licencia,
         fechaAlta: fechaAlta || null,
         estadoOperativo: estado,
-        persona,
       };
       await updateConductor(id, data);
       SwalAlert.success("Éxito", "Conductor actualizado correctamente");

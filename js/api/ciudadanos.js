@@ -225,8 +225,9 @@ window.guardarCiudadano = async () => {
 
     if (id && window.ciudadanoModalMode === "edit") {
       const data = {
+        nombre,
+        telefono: telefono || null,
         direccionCalle: direccionCalle || null,
-        persona: { nombre, telefono: telefono || null },
         idColonia: parseInt(idColonia),
       };
       await updateCiudadano(id, data);
